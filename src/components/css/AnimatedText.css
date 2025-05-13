@@ -1,0 +1,9 @@
+.text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.letter {
+  display: inline-block;
+}

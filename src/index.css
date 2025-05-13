@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  transition: .3s ease;
+}
+
+body{
+  width: 100%;
+
+  background-color: #000;
+  color: #fff;
+  /* background-image: url('./assets/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat; */
+}
+
+header{
+  padding: 20px;
+}
+header nav button{
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.content-header{
+  height: 100vh;
+}
+.content-header p{
+  line-height: 50px;
+}
+.content-header p span{
+  padding: 5px;
+  border-radius: 6px;
+}
+
+.hover-underline{
+  @apply relative inline-block after:block after:h-[2px] after:bg-white after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:transition-all after:duration-300
+}
