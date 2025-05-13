@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import './css/AnimatedText.css';
+import './style.css';
 
 const TextEffect = ({ text = "" }) => {
   const textRef = useRef(null);
