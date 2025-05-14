@@ -190,10 +190,22 @@ function Home() {
                 <span>Entregando Soluções Frontend Personalizadas que se Destacam.</span>
               </div>
 
-              <ul className="social-links flex gap-2.5 text-3xl ">          
-                <li><a className="hover group hover:text-blue-400" href='#'><i className="group-hover:text-blue-400 fa-brands fa-github"></i></a></li>
-                <li><a href="#" className='hover group hover:text-blue-700'><i className="group-hover:text-blue-700 fa-brands fa-linkedin"></i></a></li>
-                <li><a href="#" className='hover group hover:text-red-500'><i className="group-hover:text-red-500 fa-brands fa-instagram"></i></a></li>
+              <ul className="social-links flex gap-2.5 text-5xl">
+                <li>
+                  <a href="#" className="transition-all duration-300 hover:text-6xl">
+                    <i className="fa-brands fa-github"></i>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="transition-all duration-300 hover:text-6xl">
+                    <i className="fa-brands fa-linkedin"></i>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="transition-all duration-300 hover:text-6xl">
+                    <i className="fa-brands fa-instagram"></i>
+                  </a>
+                </li>
               </ul>
           </div>
           
