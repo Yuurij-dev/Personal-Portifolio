@@ -158,3 +158,20 @@ footer h1{
     font-size: 22px;
   }
 }
+
+@media screen and (max-width: 496px){
+  .personal-info-footer{
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .personal-info-footer div{
+    max-width: 100%;
+  }
+  .personal-info-footer .logo-footer{
+    justify-content: center;
+  }
+}

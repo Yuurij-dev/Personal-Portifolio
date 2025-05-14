@@ -53,7 +53,7 @@ function Home() {
             <li><a className='hover-underline' href="#projetos">Projetos</a></li>
             <li><a className='hover-underline' href="#contatos">Contatos</a></li>
           </ul>
-          
+
           <button className='border-white border cursor-pointer text-md hover:bg-white hover:text-black '>Baixar CV</button>
         </nav>
         
@@ -168,7 +168,7 @@ function Home() {
         
       </main>
       <footer className='w-full max-w-[] border-t-2 border-t-white flex flex-wrap gap-5 justify-between'>
-          <div>
+          <div className='personal-info-footer'>
               <div className=" max-w-[300px]">
 
                 <div className='logo-footer flex items-center gap-2.5'>
