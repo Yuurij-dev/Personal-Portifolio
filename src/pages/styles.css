@@ -161,6 +161,7 @@ footer h1{
 
 @media screen and (max-width: 496px){
   .personal-info-footer{
+    margin-bottom: 30px;
     width: 100%;
 
     display: flex;
@@ -170,6 +171,7 @@ footer h1{
   }
   .personal-info-footer div{
     max-width: 100%;
+    text-align: center;
   }
   .personal-info-footer .logo-footer{
     justify-content: center;
