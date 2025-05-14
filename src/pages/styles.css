@@ -1,7 +1,5 @@
 main{
   width: 100%;
-  height: 100vh;
-
 }
 header{
   padding: 20px;
@@ -13,6 +11,7 @@ header{
 header nav button{
   padding: 10px;
   border-radius: 6px;
+  transition: .3s ease;
 }
 
 .content-header{
@@ -88,9 +87,74 @@ section{
   margin-top: 20px;
   border-radius: 6px;
   padding: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
+  transition: all 0.3s ease;
+}
+.formulario button:hover{
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+
+
+footer{
+  padding: 20px 6%;
+}
+footer h1{
+  margin-bottom: 10px;
+}
+
+.social-links{
+  margin-top: 10px;
+}
+.logo-footer{
+  margin-bottom: 20px;
 }
 /* Remove Visibility */
 
 .sub-text, .text{
   visibility: hidden;
+}
+
+@media screen and (max-width: 1500px){
+  .sobre-content{
+    flex-direction: column;
+    text-align: center;
+  }
+  .sobre-content .img-me-box{
+    width: 100%;
+  }
+  .sobre-content .img-me{
+    width: 100%;
+  }
+  .sobre-content .text-me{
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 1470px){
+  .grid-projetos{
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (max-width: 760px){
+  .list-header{
+    display: none;
+  }
+}
+@media screen and (max-width: 970px){
+  .grid-projetos{
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 570px){
+  .content-header .letter{
+    font-size: 100px;
+  }
+  .content-header p {
+    font-size: 22px;
+  }
 }

@@ -4,6 +4,7 @@ import './styles.css'
 import dashboardProjeto from '../assets/projeto-dashboard.png'
 import calcProjeto from '../assets/projeto-calc.png'
 import formProjeto from '../assets/projeto-fomr.png'
+import Logo from '../assets/logo2.png'
 
 import { TextEffect, IconSkill, CardProjetos} from '../components/index'
 
@@ -37,20 +38,22 @@ function Home() {
   }, []);
   return (
     <div>
-      <header className='w-full flex flex-col items-center'>
+      <header id='home' className='w-full flex flex-col items-center'>
 
         <nav className='w-full flex justify-between items-center'>
-          <div className="">
-            <h1 className='font-bold text-md'>Yuri</h1>
-            
+          
+          <div className="logo flex items-center gap-2.5">
+            <img className='w-[50px]' src={Logo} alt="logo" />
+            <h1 className='font-bold text-2xl'>Yuri</h1>     
           </div>
-          <ul className='flex gap-2 text-sm '>
-            <li><a className='hover-underline' href="#">Home</a></li>
-            <li><a className='hover-underline' href="#">Sobre</a></li>
-            <li><a className='hover-underline' href="#">Habilidades</a></li>
-            <li><a className='hover-underline' href="#">Projetos</a></li>
-            <li><a className='hover-underline' href="#">Contatos</a></li>
+          <ul className='list-header flex gap-2 text-sm '>
+            <li><a className='hover-underline' href="#home">Home</a></li>
+            <li><a className='hover-underline' href="#sobre">Sobre</a></li>
+            <li><a className='hover-underline' href="#habilidades">Habilidades</a></li>
+            <li><a className='hover-underline' href="#projetos">Projetos</a></li>
+            <li><a className='hover-underline' href="#contatos">Contatos</a></li>
           </ul>
+          
           <button className='border-white border cursor-pointer text-md hover:bg-white hover:text-black '>Baixar CV</button>
         </nav>
         
@@ -59,21 +62,21 @@ function Home() {
           <p className='sub-text text-3xl'>Entregando Soluções Frontend Personalizadas <span className='bg-white text-black'>que se Destacam.</span></p>
           
         </div>
-
+        
         
       </header>
 
       <main className='w-full'>
 
-        <section className='sobre w-full'>
+        <section id='sobre' className='sobre w-full'>
             <div className="title text-center">
                 <h1 className='text-5xl font-bold'>Sobre mim</h1>
             </div>
 
-            <div className='w-full flex '>
+            <div className='sobre-content w-full flex '>
                 <div className="img-me-box w-1/2">
                     <div className="img-me">
-
+                        me
                     </div>
                 </div>
                 <div className="text-me w-1/2">
@@ -106,13 +109,13 @@ function Home() {
             </div>
         </section>
 
-        <section className='skill'>
+        <section id='habilidades' className='skill'>
 
             <div className="title text-center">
                 <h1 className='text-5xl font-bold'>Skills</h1>
             </div>
 
-            <div className='box-icons-skill w-full flex flex-wrap gap-5 content-center-center'>
+            <div className='box-icons-skill w-full flex flex-wrap gap-5 justify-center'>
                 <IconSkill typeIcon="html" content="devicon-html5-plain colored"/>
                 <IconSkill typeIcon="css" content="devicon-css3-plain colored" />
                 <IconSkill typeIcon="js" content="devicon-javascript-plain colored" />
@@ -131,7 +134,7 @@ function Home() {
             
         </section>
 
-        <section className='w-full'>
+        <section id='projetos' className='w-full'>
             <div className="title text-center">
                 <h1 className='text-5xl font-bold'>Projetos</h1>
             </div>
@@ -147,7 +150,7 @@ function Home() {
             </div>
         </section>
 
-        <section className='w-full'>
+        <section id='contatos' className='w-full'>
             <div className="title text-center">
                 <h1 className='text-5xl font-bold'>Fala <span className='text-black bg-white'>Comigo</span></h1>
             </div>
@@ -158,14 +161,63 @@ function Home() {
                 <input className='inputform3 w-full max-w-[500px]' type="text" placeholder='Telefone'/>
                 <textarea className='inputform4 w-full max-w-[500px] area resize-none' type="text" rows="4" placeholder='Sua Mensagem'/>
 
-                <button className='inputform5 w-full max-w-[200px] bg-white text-black font-bold text-2xl'>Enviar</button>
+                <button className='inputform5 buttonForm w-full max-w-[200px] bg-white text-black font-bold text-2xl cursor-pointer'>Enviar</button>
             </form>
         </section>
 
-        <footer>
-            meu footer
-        </footer>
+        
       </main>
+      <footer className='w-full max-w-[] border-t-2 border-t-white flex flex-wrap gap-5 justify-between'>
+          <div>
+              <div className=" max-w-[300px]">
+
+                <div className='logo-footer flex items-center gap-2.5'>
+                  <img className='w-[50px]' src={Logo} alt="logo" />
+                  <h1 className='font-bold text-2xl'>Yuri</h1>  
+                </div> 
+
+                <span>Entregando Soluções Frontend Personalizadas que se Destacam.</span>
+              </div>
+
+              <ul className="social-links flex gap-2.5 text-3xl ">          
+                <li><a className="hover group hover:text-blue-400" href='#'><i className="group-hover:text-blue-400 fa-brands fa-github"></i></a></li>
+                <li><a href="#" className='hover group hover:text-blue-700'><i className="group-hover:text-blue-700 fa-brands fa-linkedin"></i></a></li>
+                <li><a href="#" className='hover group hover:text-red-500'><i className="group-hover:text-red-500 fa-brands fa-instagram"></i></a></li>
+              </ul>
+          </div>
+          
+          <div>
+            <h1 className='font-bold text-2xl '>Skill</h1>
+            <ul className='list-disc'>
+              <li><span className='hover-underline cursor-default'>React JS</span></li>
+              <li><span className="hover-underline cursor-default">Node JS</span></li>
+              <li><span className="hover-underline cursor-default">JavaScript</span></li>
+              <li><span className="hover-underline cursor-default">TypeScript</span></li>
+              <li><span className="hover-underline cursor-default">TailWind CSS</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <h1 className='font-bold text-2xl '>Tecnologias</h1>
+            <ul className='list-disc '>
+              <li><span className="hover-underline cursor-default">GIT</span></li>
+              <li><span className="hover-underline cursor-default">GitHub</span></li>
+              <li><span className="hover-underline cursor-default">Postgress</span></li>
+              <li><span className="hover-underline cursor-default">Figma</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <h1 className='font-bold text-2xl'>Menu</h1>
+            <ul className='list-disc '>
+              <li><a href='#home' className="hover-underline cursor-pointer">Home</a></li>
+              <li><a href='#sobre' className="hover-underline cursor-pointer">Sobre</a></li>
+              <li><a href='#habilidades' className="hover-underline cursor-pointer">Habilidades</a></li>
+              <li><a href='#projetos' className="hover-underline cursor-pointer">Projetos</a></li>
+              <li><a href='#contatos' className="hover-underline cursor-pointer">Contatos</a></li>
+            </ul>
+          </div>
+      </footer>
     </div>
   )
 }

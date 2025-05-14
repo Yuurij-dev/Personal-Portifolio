@@ -8,8 +8,10 @@
   /* transition: .3s ease; */
 }
 
-body{
+html, body{
   overflow-x: hidden;
+}
+body{
   width: 100%;
 
   background-color: #000;
