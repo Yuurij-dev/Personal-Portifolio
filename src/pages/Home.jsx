@@ -5,6 +5,7 @@ import dashboardProjeto from '../assets/projeto-dashboard.png'
 import calcProjeto from '../assets/projeto-calc.png'
 import formProjeto from '../assets/projeto-fomr.png'
 import Logo from '../assets/logo2.png'
+import MePhoto from '../assets/me3.png'
 
 import { TextEffect, IconSkill, CardProjetos} from '../components/index'
 
@@ -20,6 +21,7 @@ function Home() {
         revealContent('.text-me h1','right', '90px', '0', '1000'),
         revealContent('.text-me span','right', '90px', '500', '1000'),
         revealContent('.text-me p','right', '90px', '1000', '1000'),
+        revealContent('.text-me .social-links','right', '90px', '1500', '1000'),
         revealContent('.img-me-box','left', '90px', '0', '1000'),
 
         // Skills
@@ -73,38 +75,47 @@ function Home() {
                 <h1 className='text-5xl font-bold'>Sobre mim</h1>
             </div>
 
-            <div className='sobre-content w-full flex '>
-                <div className="img-me-box w-1/2">
-                    <div className="img-me">
-                        me
-                    </div>
+            <div className='sobre-content w-full flex gap-8 '>
+                {/* <div className="img-me-box w-1/2 bg-red-300 flex items-center justify-center rounded overflow-hidden">
+                  <img src={MePhoto} alt="" className="w-full h-full object-cover" />
+                </div> */}
+
+                <div className="img-me-box w-1/2 h-[700px] bg-red-300 ">
+
                 </div>
+
                 <div className="text-me w-1/2">
                     <h1 className='font-bold text-4xl'>Yuri</h1>
                     <span className='bg-white text-black text-3xl'>Front-End Developer</span>
                     <p>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Est vero voluptatibus vel odit
-                        iure ex tempora beatae! Ipsam, non. Molestiae consequatur dicta quisquam dolorem numquam quas repudiandae consequuntur ab sit?
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Est vero voluptatibus vel odit
-                        iure ex tempora beatae! Ipsam, non. Molestiae consequatur dicta quisquam dolorem numquam quas repudiandae consequuntur ab sit?
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Est vero voluptatibus vel odit
-                        <br />
-                        <br />
-                        iure ex tempora beatae! Ipsam, non. Molestiae consequatur dicta quisquam dolorem numquam quas repudiandae consequuntur ab sit?
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Est vero voluptatibus vel odit
-                        iure ex tempora beatae! Ipsam, non. Molestiae consequatur dicta quisquam dolorem numquam quas repudiandae consequuntur ab sit?
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Est vero voluptatibus vel odit
-                        iure ex tempora beatae! Ipsam, non. Molestiae consequatur dicta quisquam dolorem numquam quas repudiandae consequuntur ab sit?
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Est vero voluptatibus vel odit
-                        <br />
-                        <br />
-                        iure ex tempora beatae! Ipsam, non. Molestiae consequatur dicta quisquam dolorem numquam quas repudiandae consequuntur ab sit?
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Est vero voluptatibus vel odit
-                        iure ex tempora beatae! Ipsam, non. Molestiae consequatur dicta quisquam dolorem numquam quas repudiandae consequuntur ab sit?
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Est vero voluptatibus vel odit
-                        iure ex tempora beatae! Ipsam, non. Molestiae consequatur dicta quisquam dolorem numquam quas repudiandae consequuntur ab sit?
-                        
+                        Sou um desenvolvedor Front-End apaixonado por criar interfaces intuitivas, modernas e acessíveis. 
+                        Atualmente estou cursando Análise e Desenvolvimento de Sistemas e busco constantemente 
+                        evoluir tanto tecnicamente quanto como profissional.
+                        <br /><br />
+                        Tenho experiência com tecnologias como HTML, CSS, JavaScript e React, e estou sempre explorando 
+                        novas ferramentas e práticas para entregar projetos eficientes e com ótima usabilidade. 
+                        Acredito que o design aliado a um bom código transforma ideias em experiências reais.
+                        <br /><br />
+                        Estou pronto para contribuir com soluções criativas, trabalhar em equipe e aprender algo novo todos os dias.
                     </p>
+
+                    <ul className="social-links flex gap-2.5 text-5xl">
+                      <li>
+                        <a href="#" className="transition-all duration-300 hover:text-6xl">
+                          <i className="fa-brands fa-github"></i>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="#" className="transition-all duration-300 hover:text-6xl">
+                          <i className="fa-brands fa-linkedin"></i>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="#" className="transition-all duration-300 hover:text-6xl">
+                          <i className="fa-brands fa-instagram"></i>
+                        </a>
+                      </li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -167,7 +178,7 @@ function Home() {
 
         
       </main>
-      <footer className='w-full max-w-[] border-t-2 border-t-white flex flex-wrap gap-5 justify-between'>
+      <footer className='w-full max-w-[] border-t border-t-white flex flex-wrap gap-5 justify-between'>
           <div className='personal-info-footer'>
               <div className=" max-w-[300px]">
 
