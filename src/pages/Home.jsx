@@ -151,12 +151,9 @@ function Home() {
             </div>
 
             <div className='grid-projetos w-full grid grid-cols-3 gap-8 justify-items-center '>
-                <CardProjetos title="Projeto 1" img={dashboardProjeto} p="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla it, sed efficitur nunc tincidunt eget. Lorem ipsum dolor sit amet, consec"/>
-                <CardProjetos title="Projeto 2" img={calcProjeto} p="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla it, sed efficitur nunc tincidunt eget. Lorem ipsum dolor sit amet, consec"/>
-                <CardProjetos title="Projeto 3" img={formProjeto} p="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla it, sed efficitur nunc tincidunt eget. Lorem ipsum dolor sit amet, consec"/>
-                <CardProjetos title="Projeto 1" img={dashboardProjeto} p="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla it, sed efficitur nunc tincidunt eget. Lorem ipsum dolor sit amet, consec"/>
-                <CardProjetos title="Projeto 2" img={calcProjeto} p="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla it, sed efficitur nunc tincidunt eget. Lorem ipsum dolor sit amet, consec"/>
-                <CardProjetos title="Projeto 3" img={formProjeto} p="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla it, sed efficitur nunc tincidunt eget. Lorem ipsum dolor sit amet, consec"/>
+                <CardProjetos link="https://gerenciador-de-produtos-lime.vercel.app/" title="Projeto 1" img={dashboardProjeto} p="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla it, sed efficitur nunc tincidunt eget. Lorem ipsum dolor sit amet, consec"/>
+                <CardProjetos link="https://age-calculator-bice-seven.vercel.app/" title="Projeto 2" img={calcProjeto} p="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla it, sed efficitur nunc tincidunt eget. Lorem ipsum dolor sit amet, consec"/>
+                <CardProjetos link="https://age-calculator-bice-seven.vercel.app/" title="Projeto 3" img={formProjeto} p="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla it, sed efficitur nunc tincidunt eget. Lorem ipsum dolor sit amet, consec"/>
 
             </div>
         </section>
