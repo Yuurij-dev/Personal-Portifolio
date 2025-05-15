@@ -8,7 +8,7 @@ function CardProjetos({title, p, img, link}) {
           <div className='img-card w-full rounded overflow-hidden '>
             <img src={img} alt="imagem-projeto" className="w-full h-full object-center" />
           </div>
-          <h1 className='w-[100px] rounded text-center font-bold text-1xl bg-white text-black'>{title}</h1>
+          <h1 className='max-w-[250px] rounded text-center font-bold text-1xl bg-white text-black'>{title}</h1>
           <p className='text-sm'>{p}</p>
         </a>
     </div>
