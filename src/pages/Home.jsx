@@ -20,8 +20,10 @@ function Home() {
         // Sobre
         revealContent('.text-me h1','right', '90px', '0', '1000'),
         revealContent('.text-me span','right', '90px', '500', '1000'),
-        revealContent('.text-me p','right', '90px', '1000', '1000'),
-        revealContent('.text-me .social-links','right', '90px', '1500', '1000'),
+        revealContent('.text-me .p-1','right', '90px', '1000', '1000'),
+        revealContent('.text-me .p-2','right', '90px', '1500', '1000'),
+        revealContent('.text-me .p-3','right', '90px', '2000', '1000'),
+        revealContent('.text-me .social-links','right', '90px', '2500', '1000'),
         revealContent('.img-me-box','left', '90px', '0', '1000'),
 
         // Skills
@@ -87,16 +89,20 @@ function Home() {
                 <div className="text-me w-1/2">
                     <h1 className='font-bold text-4xl'>Yuri</h1>
                     <span className='bg-white text-black text-3xl'>Front-End Developer</span>
-                    <p>
+                    <p className='p-1'>
                         Sou um desenvolvedor Front-End apaixonado por criar interfaces intuitivas, modernas e acessíveis. 
                         Atualmente estou cursando Análise e Desenvolvimento de Sistemas e busco constantemente 
-                        evoluir tanto tecnicamente quanto como profissional.
-                        <br /><br />
-                        Tenho experiência com tecnologias como HTML, CSS, JavaScript e React, e estou sempre explorando 
+                        evoluir tanto tecnicamente quanto como profissional.      
+                    </p>
+                    <br />
+                    <p className='p-2'>
+                      Tenho experiência com tecnologias como HTML, CSS, JavaScript e React, e estou sempre explorando 
                         novas ferramentas e práticas para entregar projetos eficientes e com ótima usabilidade. 
                         Acredito que o design aliado a um bom código transforma ideias em experiências reais.
-                        <br /><br />
-                        Estou pronto para contribuir com soluções criativas, trabalhar em equipe e aprender algo novo todos os dias.
+                    </p>
+                    <br />
+                    <p className='p-3'>
+                      Estou pronto para contribuir com soluções criativas, trabalhar em equipe e aprender algo novo todos os dias.
                     </p>
 
                     <ul className="social-links flex gap-2.5 text-5xl">
@@ -164,12 +170,15 @@ function Home() {
             </div>
 
             <form className='formulario w-full flex gap-2.5 flex-col items-center justify-center'>
-                <input className='inputform1 w-full max-w-[500px]' type="text" placeholder='Nome'/>
-                <input className='inputform2 w-full max-w-[500px]' type="text" placeholder='Email'/>
-                <input className='inputform3 w-full max-w-[500px]' type="text" placeholder='Telefone'/>
-                <textarea className='inputform4 w-full max-w-[500px] area resize-none' type="text" rows="4" placeholder='Sua Mensagem'/>
+                <input className='inputform1 w-full max-w-[500px]' name='name' type="text" required placeholder='Nome'/>
+                <input className='inputform2 w-full max-w-[500px]' name="email" type="email" required placeholder='Email'/>
+                <input className='inputform3 w-full max-w-[500px]' name='phone' type="text"  placeholder='Telefone'/>
+                <textarea name="message" className='inputform4 w-full max-w-[500px] area resize-none' required type="text" rows="4" placeholder='Sua Mensagem'/>
 
-                <button className='inputform5 buttonForm w-full max-w-[200px] bg-white text-black font-bold text-2xl cursor-pointer'>Enviar</button>
+                
+
+                <button type='submit' className='inputform5 buttonForm w-full max-w-[200px] bg-white text-black font-bold text-2xl cursor-pointer'>Enviar</button>
+                
             </form>
         </section>
 
