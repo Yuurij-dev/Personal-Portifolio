@@ -75,7 +75,6 @@ function Home() {
       const text = await response.text();
 
       if(response.ok){
-        alert(text);
         setShowSucessMessage(true);
         setFormData({ nome: '', email: '', mensagem: '' });
       }else{
