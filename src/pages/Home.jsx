@@ -47,7 +47,9 @@ function Home() {
     email: '',
     mensagem: ''
   })
+
   const [isSending, setIsSending] = useState(false);
+  const [showSucessMessage, setShowSucessMessage] = useState(false)
 
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value});
@@ -71,13 +73,19 @@ function Home() {
       });
 
       const text = await response.text();
-      alert(text);
+
+      if(response.ok){
+        alert(text);
+        setShowSucessMessage(true);
+        setFormData({ nome: '', email: '', mensagem: '' });
+      }else{
+        throw new Error("Falha ao enviar e-mail");
+      }
     } catch (error) {
       console.error("Erro ao enviar e-mail:", error);
       alert("Falha ao enviar. Tente novamente.");
     } finally {
       setIsSending(false)
-      setFormData({ nome: '', email: '', mensagem: '' });
     }
   };
 
@@ -209,15 +217,24 @@ function Home() {
             <div className="title text-center">
                 <h1 className='text-5xl font-bold'>Fala <span className='text-black bg-white'>Comigo</span></h1>
             </div>
-
+            
+            
             <form onSubmit={handleSubmit} method="POST" className='formulario w-full flex gap-2.5 flex-col items-center justify-center'>
-                <input className='inputform1 w-full max-w-[500px]' name='nome' value={formData.nome} onChange={handleChange} type="text" required placeholder='Nome'/>
-                <input className='inputform2 w-full max-w-[500px]' name="email" value={formData.email} onChange={handleChange} type="email" required placeholder='Email'/>
-                {/* <input className='inputform3 w-full max-w-[500px]' name='phone'  type="text"  placeholder='Telefone'/> */}
-                <textarea name="mensagem" value={formData.mensagem} onChange={handleChange} className='inputform4 w-full max-w-[500px] area resize-none' required type="text" rows="4" placeholder='Sua Mensagem'/>               
 
-                <button type='submit' disabled={isSending} className='inputform5 buttonForm w-full max-w-[200px] bg-white text-black font-bold text-2xl cursor-pointer'>{isSending ? 'Enviando...' : 'Enviar'}</button>
-                
+              {showSucessMessage && (
+                <div className='sucesso-form max-w-[500px] w-full h-[50px] flex items-center  border-l-8 rounded border-green-400 bg-green-200 px-4'>
+                  <span className='text-black font-bold'>Email enviado com sucesso</span>
+                </div>
+              )}
+
+              <input className='inputform1 w-full max-w-[500px]' name='nome' value={formData.nome} onChange={handleChange} type="text" required placeholder='Nome'/>
+              <input className='inputform2 w-full max-w-[500px]' name="email" value={formData.email} onChange={handleChange} type="email" required placeholder='Email'/>
+              <textarea name="mensagem" value={formData.mensagem} onChange={handleChange} className='inputform4 w-full max-w-[500px] area resize-none' required rows="4" placeholder='Sua Mensagem'/>
+
+              <button type='submit' disabled={isSending} className='inputform5 buttonForm w-full max-w-[200px] bg-white text-black font-bold text-2xl cursor-pointer'>
+                {isSending ? 'Enviando...' : 'Enviar'}
+              </button>
+
             </form>
         </section>
 

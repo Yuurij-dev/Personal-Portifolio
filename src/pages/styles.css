@@ -103,7 +103,9 @@ section{
   color: #fff;
   border: 1px solid #fff;
 }
-
+.sucesso-form{
+  padding-left: 10px;
+}
 
 
 footer{
