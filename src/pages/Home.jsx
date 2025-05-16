@@ -87,7 +87,7 @@ function Home() {
             <h1 className='font-bold text-2xl'>Yuri</h1>     
           </div>
           <ul className='list-header flex gap-2 text-sm '>
-            <li><a className='hover-underline' href="#home">Home</a></li>
+            <li><a className='hover-underline' href="#home">Hoasdasdme</a></li>
             <li><a className='hover-underline' href="#sobre">Sobre</a></li>
             <li><a className='hover-underline' href="#habilidades">Habilidades</a></li>
             <li><a className='hover-underline' href="#projetos">Projetos</a></li>
