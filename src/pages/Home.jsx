@@ -109,7 +109,9 @@ function Home() {
             <li><a className='hover-underline' href="#contatos">Contatos</a></li>
           </ul>
 
-          <button className='border-white border cursor-pointer text-md hover:bg-white hover:text-black '>Baixar CV</button>
+          <a href="/Curriculo_Yuri_jesus.pdf" download>
+            <button  className='border-white border cursor-pointer text-md hover:bg-white hover:text-black '>Baixar CV</button>
+          </a>
         </nav>
         
         <div className="content-header flex flex-col w-full max-w-2xl items-center justify-center text-center">

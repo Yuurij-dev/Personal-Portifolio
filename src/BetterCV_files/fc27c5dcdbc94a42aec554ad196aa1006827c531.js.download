@@ -1,0 +1,1817 @@
+(function () {
+
+    if (typeof window.CustomEvent === "function") {
+        return false;
+    }
+
+    function CustomEvent(event, params)
+    {
+        params = params || {bubbles: false, cancelable: false, detail: undefined};
+        var evt = document.createEvent('CustomEvent');
+        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+        return evt;
+    }
+
+    CustomEvent.prototype = window.Event.prototype;
+
+    window.CustomEvent = CustomEvent;
+})();
+
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
+        typeof define === 'function' && define.amd ? define(factory) :
+            (factory());
+}(this, (function () {
+    'use strict';
+
+    /**
+     * @this {Promise}
+     */
+    function finallyConstructor(callback)
+    {
+        var constructor = this.constructor;
+        return this.then(
+            function (value) {
+                // @ts-ignore
+                return constructor.resolve(callback()).then(function () {
+                    return value;
+                });
+            },
+            function (reason) {
+                // @ts-ignore
+                return constructor.resolve(callback()).then(function () {
+                    // @ts-ignore
+                    return constructor.reject(reason);
+                });
+            }
+        );
+    }
+
+// Store setTimeout reference so promise-polyfill will be unaffected by
+// other code modifying setTimeout (like sinon.useFakeTimers())
+    var setTimeoutFunc = setTimeout;
+
+    function isArray(x)
+    {
+        return Boolean(x && typeof x.length !== 'undefined');
+    }
+
+    function noop()
+    {
+    }
+
+// Polyfill for Function.prototype.bind
+    function bind(fn, thisArg)
+    {
+        return function () {
+            fn.apply(thisArg, arguments);
+        };
+    }
+
+    /**
+     * @constructor
+     * @param {Function} fn
+     */
+    function Promise(fn)
+    {
+        if (!(this instanceof Promise)) {
+            throw new TypeError('Promises must be constructed via new');
+        }
+        if (typeof fn !== 'function') {
+            throw new TypeError('not a function');
+        }
+        /** @type {!number} */
+        this._state = 0;
+        /** @type {!boolean} */
+        this._handled = false;
+        /** @type {Promise|undefined} */
+        this._value = undefined;
+        /** @type {!Array<!Function>} */
+        this._deferreds = [];
+
+        doResolve(fn, this);
+    }
+
+    function handle(self, deferred)
+    {
+        while (self._state === 3) {
+            self = self._value;
+        }
+        if (self._state === 0) {
+            self._deferreds.push(deferred);
+            return;
+        }
+        self._handled = true;
+        Promise._immediateFn(function () {
+            var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+            if (cb === null) {
+                (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
+                return;
+            }
+            var ret;
+            try {
+                ret = cb(self._value);
+            } catch (e) {
+                reject(deferred.promise, e);
+                return;
+            }
+            resolve(deferred.promise, ret);
+        });
+    }
+
+    function resolve(self, newValue)
+    {
+        try {
+            // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
+            if (newValue === self) {
+                throw new TypeError('A promise cannot be resolved with itself.');
+            }
+            if (
+                newValue &&
+                (typeof newValue === 'object' || typeof newValue === 'function')
+            ) {
+                var then = newValue.then;
+                if (newValue instanceof Promise) {
+                    self._state = 3;
+                    self._value = newValue;
+                    finale(self);
+                    return;
+                } else if (typeof then === 'function') {
+                    doResolve(bind(then, newValue), self);
+                    return;
+                }
+            }
+            self._state = 1;
+            self._value = newValue;
+            finale(self);
+        } catch (e) {
+            reject(self, e);
+        }
+    }
+
+    function reject(self, newValue)
+    {
+        self._state = 2;
+        self._value = newValue;
+        finale(self);
+    }
+
+    function finale(self)
+    {
+        if (self._state === 2 && self._deferreds.length === 0) {
+            Promise._immediateFn(function () {
+                if (!self._handled) {
+                    Promise._unhandledRejectionFn(self._value);
+                }
+            });
+        }
+
+        for (var i = 0, len = self._deferreds.length; i < len; i++) {
+            handle(self, self._deferreds[i]);
+        }
+        self._deferreds = null;
+    }
+
+    /**
+     * @constructor
+     */
+    function Handler(onFulfilled, onRejected, promise)
+    {
+        this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+        this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+        this.promise = promise;
+    }
+
+    /**
+     * Take a potentially misbehaving resolver function and make sure
+     * onFulfilled and onRejected are only called once.
+     *
+     * Makes no guarantees about asynchrony.
+     */
+    function doResolve(fn, self)
+    {
+        var done = false;
+        try {
+            fn(
+                function (value) {
+                    if (done) {
+                        return;
+                    }
+                    done = true;
+                    resolve(self, value);
+                },
+                function (reason) {
+                    if (done) {
+                        return;
+                    }
+                    done = true;
+                    reject(self, reason);
+                }
+            );
+        } catch (ex) {
+            if (done) {
+                return;
+            }
+            done = true;
+            reject(self, ex);
+        }
+    }
+
+    Promise.prototype['catch'] = function (onRejected) {
+        return this.then(null, onRejected);
+    };
+
+    Promise.prototype.then = function (onFulfilled, onRejected) {
+        // @ts-ignore
+        var prom = new this.constructor(noop);
+
+        handle(this, new Handler(onFulfilled, onRejected, prom));
+        return prom;
+    };
+
+    Promise.prototype['finally'] = finallyConstructor;
+
+    Promise.all = function (arr) {
+        return new Promise(function (resolve, reject) {
+            if (!isArray(arr)) {
+                return reject(new TypeError('Promise.all accepts an array'));
+            }
+
+            var args = Array.prototype.slice.call(arr);
+            if (args.length === 0) {
+                return resolve([]);
+            }
+            var remaining = args.length;
+
+            function res(i, val)
+            {
+                try {
+                    if (val && (typeof val === 'object' || typeof val === 'function')) {
+                        var then = val.then;
+                        if (typeof then === 'function') {
+                            then.call(
+                                val,
+                                function (val) {
+                                    res(i, val);
+                                },
+                                reject
+                            );
+                            return;
+                        }
+                    }
+                    args[i] = val;
+                    if (--remaining === 0) {
+                        resolve(args);
+                    }
+                } catch (ex) {
+                    reject(ex);
+                }
+            }
+
+            for (var i = 0; i < args.length; i++) {
+                res(i, args[i]);
+            }
+        });
+    };
+
+    Promise.resolve = function (value) {
+        if (value && typeof value === 'object' && value.constructor === Promise) {
+            return value;
+        }
+
+        return new Promise(function (resolve) {
+            resolve(value);
+        });
+    };
+
+    Promise.reject = function (value) {
+        return new Promise(function (resolve, reject) {
+            reject(value);
+        });
+    };
+
+    Promise.race = function (arr) {
+        return new Promise(function (resolve, reject) {
+            if (!isArray(arr)) {
+                return reject(new TypeError('Promise.race accepts an array'));
+            }
+
+            for (var i = 0, len = arr.length; i < len; i++) {
+                Promise.resolve(arr[i]).then(resolve, reject);
+            }
+        });
+    };
+
+// Use polyfill for setImmediate for performance gains
+    Promise._immediateFn =
+        // @ts-ignore
+        (typeof setImmediate === 'function' &&
+            function (fn) {
+                // @ts-ignore
+                setImmediate(fn);
+            }) ||
+        function (fn) {
+            setTimeoutFunc(fn, 0);
+        };
+
+    Promise._unhandledRejectionFn = function _unhandledRejectionFn(err)
+    {
+        if (typeof console !== 'undefined' && console) {
+            console.warn('Possible Unhandled Promise Rejection:', err); // eslint-disable-line no-console
+        }
+    };
+
+    /** @suppress {undefinedVars} */
+    var globalNS = (function () {
+        // the only reliable means to get the global object is
+        // `Function('return this')()`
+        // However, this causes CSP violations in Chrome apps.
+        if (typeof self !== 'undefined') {
+            return self;
+        }
+        if (typeof window !== 'undefined') {
+            return window;
+        }
+        if (typeof global !== 'undefined') {
+            return global;
+        }
+        throw new Error('unable to locate global object');
+    })();
+
+    if (typeof globalNS['Promise'] !== 'function') {
+        globalNS['Promise'] = Promise;
+    } else if (!globalNS.Promise.prototype['finally']) {
+        globalNS.Promise.prototype['finally'] = finallyConstructor;
+    }
+
+})));
+    function initApmGateTrack() {
+        (function () {
+            if (!('_private_provider_track' in window)){
+                window._private_provider_track = function(){
+                    window._private_provider_track.q.push(arguments);
+                };
+                window._private_provider_track.q = [];
+            }
+
+            var script   = document.createElement('script');
+
+            script.src   = 'https\u003A\/\/cdn.solidgate.com\/js\/track.2.0.1.js';
+            script.async = true;
+            script.defer = true;
+
+            var firstScript = document.getElementsByTagName('script')[0];
+            firstScript.parentNode.insertBefore(script, firstScript);
+        })();
+
+        var trackerConfig = {
+            url: 'https\u003A\/\/track\u002Dext.solidgate.com',
+        };
+
+        _private_provider_track('start', trackerConfig, {})
+    }
+
+    var skipTrack = (window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1"));
+    if (skipTrack) {
+        window._private_provider_track = function(){};
+    } else {
+        initApmGateTrack();
+    }
+
+
+var apmGatePayPalSdk = (function () {
+    var exceptionListener = function (eventName, params) {};
+    var saveEventToTrack = function (eventName, params) {};
+
+    var shippingAddressValidator = function (shippingAddress) {
+        console.log('shippingAddressValidator is not defined. Use fallback flow - allow all addresses')
+        return new Promise((resolve, reject) => {resolve({allow: true})});
+    };
+
+    var baseApiPath = null;
+    var ppButtonDomId = null;
+    var ppButtonElem = null;
+    var countryParams = {};
+    var userAction = null;
+
+    const checkoutFlow = 'checkout';
+    const vaultFlow = 'vault'
+
+    function includeScript(file) {
+        return new Promise(function (resolve, reject) {
+            var script = document.createElement('script');
+            script.src = file;
+            script.type = 'text/javascript';
+            script.defer = true;
+            script.async = true;
+            document.getElementsByTagName('head').item(0).appendChild(script);
+
+            script.onload = function () {
+                resolve();
+            };
+        })
+    }
+
+    function includeFraudNetScriptParams(sandbox, fraudnetSessionId) {
+        var fraudNetData = {
+            "f": fraudnetSessionId,
+            "s": 'SGATE_WIDGET_PAY_BTN',
+            "sandbox": sandbox
+        }
+
+        return new Promise(function (resolve, reject) {
+            // delete existing fraudnet params (from previous payment attempt)
+            var prevDataEl = document.querySelectorAll("[fncls=fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99]");
+            for (var i = 0; i < prevDataEl.length; i++) {
+                prevDataEl[i].remove();
+            }
+
+            var script = document.createElement('script');
+            script.append(JSON.stringify(fraudNetData))
+            script.type = 'application/json';
+            script.setAttribute('fncls', 'fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99')
+            document.getElementsByTagName('head').item(0).appendChild(script);
+
+            // script.onload is not relevant here because we did not specify the external script.src
+            // https://javascript.info/onload-onerror#other-resources
+            resolve();
+        })
+    }
+
+    function includeFraudNetScript() {
+        return new Promise(function (resolve, reject) {
+            var script = document.createElement('script');
+            script.src = "https://c.paypal.com/da/r/fb.js";
+            script.type = 'text/javascript';
+            document.getElementsByTagName('head').item(0).appendChild(script);
+
+            script.onload = function () {
+                resolve();
+            };
+        })
+    }
+
+    function measureScriptLoadingTime(eventName, trackCategory, trackLevel, trackData, scriptSource) {
+        try {
+            var performance = (
+                window.performance ||
+                window.mozPerformance ||
+                window.msPerformance ||
+                window.webkitPerformance ||
+                null
+            );
+
+            if (!scriptSource || !performance || !performance.getEntriesByType) {
+                return;
+            }
+
+            var entries = performance.getEntriesByType('resource');
+
+            while (entries.length) {
+                var entry = entries.shift()
+
+                if (entry.name === scriptSource) {
+                    saveEventToTrack(eventName, {
+                        category: trackCategory,
+                        level: trackLevel,
+                        entity_name: trackData.entityName,
+                        entity_value: trackData.entityValue,
+                        event_time: (new Date()).toISOString(),
+                        value: entry.duration.toString()
+                    }, trackData.signature)
+
+                    break;
+                }
+            }
+
+        } catch (_) {
+
+        }
+    }
+
+    function initButton(
+        flow,
+        initPaymentCallbackFn,
+        paypalScriptDataset,
+        spOrderStatus,
+        fraudnetSessionId,
+        trackData,
+        currentScriptSrc
+    ) {
+        var eventOrderStartedProcessing = 'order-started-processing'
+        var eventOrderApproved = 'order-approved'
+        var eventOrderProcessed = 'order-processed'
+        var eventOrderAlreadyProcessed = 'order-already-processed'
+        var eventButtonReady = 'button-ready'
+        var eventButtonClick = 'button-click'
+        var eventButtonError = 'button-error'
+        var eventButtonCancel = 'button-cancel'
+
+        var trackCreateBaError = 'paypal_create_ba_error'
+        var trackCreateOrderError = 'paypal_create_order_error'
+        var trackButtonGeneralError = 'paypal_button_general_error'
+        var trackButtonError = 'paypal_button_error'
+        var trackButtonCancel = 'paypal_button_cancel'
+
+        var trackCategory = 'direct_paypal_button'
+        var trackLevel = 'button_loading'
+
+        if (spOrderStatus === 'created') {
+            renderButton(initPaymentCallbackFn, paypalScriptDataset)
+        } else {
+            sendDomEvent(eventOrderAlreadyProcessed, {})
+        }
+
+        function renderButton(initPaymentCallbackFn, paypalScriptDataset) {
+            try {
+                var buttonStyle = {
+                    label: 'buynow',
+                    shape: 'pill',
+                    color: 'gold'
+                };
+
+                if (paypalScriptDataset) {
+                    ['label', 'shape', 'color'].forEach(function (key) {
+                        if (paypalScriptDataset[key]) {
+                            buttonStyle[key] = paypalScriptDataset[key];
+                        }
+                    });
+                    ['height'].forEach(function (key) {
+                        if (paypalScriptDataset[key]) {
+                            buttonStyle[key] = parseInt(paypalScriptDataset[key], 10);
+                        }
+                    });
+                }
+
+                if (paypalScriptDataset['shippingAddrValidatorFn'] !== undefined) {
+                    var functionName = paypalScriptDataset['shippingAddrValidatorFn']
+                    if (!window[functionName]) {
+                        console.error("Function for validate address '"+functionName +"' not found");
+                    } else {
+                        shippingAddressValidator = window[functionName]
+                    }
+                }
+
+                var apmGateToken = 'undefined';
+
+                var ppButtonParams = {
+                    // https://developer.paypal.com/docs/checkout/integration-features/standalone-buttons/
+                    fundingSource: paypal.FUNDING.PAYPAL,
+                    style: buttonStyle,
+                    // onInit is called when the button first renders
+                    onInit: function (data, actions) {
+                        sendDomEvent(eventButtonReady, {});
+
+                        saveEventToTrack("payment_source_location_hostname", {
+                            category: trackCategory,
+                            level: trackLevel,
+                            event_time: (new Date()).toISOString(),
+                            entity_name: trackData.entityName,
+                            entity_value: trackData.entityValue,
+                            value: window.location.hostname
+                        }, trackData.signature)
+
+                        measureScriptLoadingTime(
+                            "paypal_script_load_time",
+                            trackCategory,
+                            trackLevel,
+                            trackData,
+                            currentScriptSrc
+                        )
+                    },
+                    createOrder: function (data, actions) {
+                        if (flow === checkoutFlow) {
+                            sendDomEvent(eventButtonClick, {});
+
+                            return initPaymentCallbackFn().then(function (initPaymentObj) {
+                                apmGateToken = initPaymentObj.apmGateToken
+                                return apmGateToken
+                            }).then(function (apmGateToken) {
+                                return fetch(baseApiPath + '/paypal-direct/api/' + apmGateToken + '/createOrder', {
+                                    method: 'post',
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        'fraudnet_session_id': fraudnetSessionId
+                                    })
+                                })
+                            }).catch(function (err) {
+                                saveEventToTrack(trackCreateOrderError, {
+                                    category: trackCategory,
+                                    level: trackLevel,
+                                    entity_name: trackData.entityName,
+                                    entity_value: trackData.entityValue,
+                                    event_time: (new Date()).toISOString(),
+                                    value: formatErrorMessage(err)
+                                }, trackData.signature)
+
+                                throw err;
+                            }).then(function (res) {
+                                return res.json();
+                            }).then(function (orderData) {
+                                if (orderData.id != null) {
+                                    return orderData.id;
+                                }
+
+                                if (orderData.id == null && orderData.error != null) {
+                                    var message = 'Error creating order: ' + orderData.error
+                                    saveEventToTrack(trackCreateOrderError, {
+                                        category: trackCategory,
+                                        level: trackLevel,
+                                        entity_name: trackData.entityName,
+                                        entity_value: trackData.entityValue,
+                                        event_time: (new Date()).toISOString(),
+                                        value: message
+                                    }, trackData.signature)
+                                    sendDomEvent(eventButtonError, {error: transformError(message)})
+                                }
+
+                                return null;
+                            });
+                        }
+                    },
+                    createBillingAgreement: function () {
+                        if (flow === vaultFlow) {
+                            sendDomEvent(eventButtonClick, {});
+
+                            return initPaymentCallbackFn().then(function (initPaymentObj) {
+                                apmGateToken = initPaymentObj.apmGateToken
+                                return apmGateToken
+                            }).then(function (apmGateToken) {
+                                return fetch(baseApiPath + '/paypal-direct/api/' + apmGateToken + '/createBaTmpToken', {
+                                    method: 'post',
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        'fraudnet_session_id': fraudnetSessionId
+                                    })
+                                })
+                            }).catch(function (err) {
+                                saveEventToTrack(trackCreateBaError, {
+                                    category: trackCategory,
+                                    level: trackLevel,
+                                    entity_name: trackData.entityName,
+                                    entity_value: trackData.entityValue,
+                                    event_time: (new Date()).toISOString(),
+                                    value: formatErrorMessage(err)
+                                }, trackData.signature)
+
+                                throw err;
+                            }).then(function (res) {
+                                return res.json();
+                            }).then(function (res) {
+                                // return the BA-XXXXX token
+                                return res.token_id;
+                            });
+                        }
+                    },
+                    onShippingChange: async function (data, actions) {
+                        let country = countryParams[data.shipping_address.country_code]
+                        if (country === undefined) {
+                            console.error('Unknown country code:', data.shipping_address.country_code)
+                            return actions.reject()
+                        }
+
+                        let shippingAddress = {
+                            "country_a3": country['IsoCodeA3'],
+                            "country_a2": data.shipping_address.country_code,
+                            "state": data.shipping_address['state'] ?? null,
+                            "city": data.shipping_address['city'] ?? null,
+                            "zip": data.shipping_address['postal_code'] ?? null,
+                        }
+
+                        await shippingAddressValidator(shippingAddress)
+                            .then((res) => {
+                                if (typeof res !== "object") {
+                                    console.error('Unknown response from address validator. Result must be an object')
+                                    actions.reject()
+                                }
+
+                                if (typeof res['allow'] !== "boolean") {
+                                    console.error('Unknown response from address validator. Key "allow" must contain a boolean value')
+                                    actions.reject()
+                                }
+
+                                if (res['allow']) {
+                                    return actions.resolve();
+                                } else {
+                                    return actions.reject();
+                                }
+                            })
+                            .catch((err) =>{
+                                console.error('Address validation error:', err)
+                                actions.reject()
+                            });
+                    },
+                    onApprove: function (data, actions) {
+                        if (flow === checkoutFlow) {
+                            if (userAction==="continue") {
+                                return fetch(baseApiPath + '/paypal-direct/api/' + apmGateToken + '/onApprove', {
+                                    method: 'post',
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        'paypal_order_id': data.orderID
+                                    })
+                                }).then(function (res) {
+                                    return res.json();
+                                }).then(function (orderData) {
+                                    sendDomEvent(eventOrderApproved, {data: orderData});
+
+                                    return null;
+                                });
+                            } else {
+                                sendDomEvent(eventOrderStartedProcessing, {});
+
+                                // https://developer.paypal.com/docs/business/checkout/server-side-api-calls/handle-funding-failures/#sample-javascript-sdk-code
+                                // https://developer.paypal.com/docs/checkout/integration-features/funding-failure/
+                                return fetch(baseApiPath + '/paypal-direct/api/' + apmGateToken + '/captureOrder', {
+                                    method: 'post',
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        'paypal_order_id': data.orderID,
+                                        'fraudnet_session_id': fraudnetSessionId,
+                                    })
+                                }).then(function (res) {
+                                    return res.json();
+                                }).then(function (orderData) {
+                                    console.log('Transaction completed');
+                                    sendDomEvent(eventOrderProcessed, {data: orderData})
+
+                                    return null;
+                                });
+                            }
+                        }
+
+                        if (flow === vaultFlow) {
+                            sendDomEvent(eventOrderStartedProcessing, {})
+                            return fetch(baseApiPath + '/paypal-direct/api/' + apmGateToken + '/createBaAndPay', {
+                                method: 'post',
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    'billing_agreement_tmp_token': data.billingToken,
+                                    'fraudnet_session_id': fraudnetSessionId,
+                                })
+                            }).then(function (res) {
+                                return res.json();
+                            }).then(function (res) {
+                                sendDomEvent(eventOrderProcessed, {data: res})
+
+                                console.log('Transaction completed');
+
+                                return null;
+                            });
+                        }
+                    },
+                    onError: function (err) {
+                        console.log('error', err);
+                        saveEventToTrack(trackButtonError, {
+                            category: trackCategory,
+                            level: trackLevel,
+                            entity_name: trackData.entityName,
+                            entity_value: trackData.entityValue,
+                            event_time: (new Date()).toISOString(),
+                            value: formatErrorMessage(err)
+                        }, trackData.signature)
+
+                        if (err && err.message === 'Expected an order id to be passed') {
+                            return // Decline orders will already be on the backend
+                        }
+
+                        if (err && err.message === 'Detected popup close') {
+                            return
+                        }
+
+                        if (err && err.message === 'Component closed') {
+                            return
+                        }
+
+                        // system solution will be developed in SIG2-9851
+                        if (err && err.message === 'Document is ready and element #paypal-button does not exist') {
+                            return
+                        }
+
+                        captureException(err);
+
+                        return fetch(baseApiPath + '/paypal-direct/api/' + apmGateToken + '/processDeclineFlow', {
+                            method: 'post',
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                'error_message': JSON.stringify(transformError(err))
+                            })
+                        })
+                    },
+                    onCancel: function () {
+                        console.log('raise on_cancel')
+                        saveEventToTrack(trackButtonCancel, {
+                            category: trackCategory,
+                            level: trackLevel,
+                            entity_name: trackData.entityName,
+                            entity_value: trackData.entityValue,
+                            event_time: (new Date()).toISOString()
+                        }, trackData.signature)
+
+                        sendDomEvent(eventButtonCancel, {})
+                    }
+                };
+
+                if (flow === vaultFlow) {
+                    delete ppButtonParams.createOrder;
+                }
+                if (flow === checkoutFlow) {
+                    delete ppButtonParams.createBillingAgreement;
+                }
+                paypal.Buttons(ppButtonParams).render('#' + ppButtonDomId);
+            } catch (err) {
+                saveEventToTrack(trackButtonGeneralError, {
+                    category: trackCategory,
+                    level: trackLevel,
+                    entity_name: trackData.entityName,
+                    entity_value: trackData.entityValue,
+                    event_time: (new Date()).toISOString(),
+                    value: formatErrorMessage(err)
+                }, trackData.signature)
+
+                captureException(err)
+                sendDomEvent(eventButtonError, {error: transformError(err)})
+            }
+        }
+
+        function sendDomEvent(eventName, data) {
+            if (ppButtonElem) {
+                ppButtonElem.dispatchEvent(new CustomEvent(eventName, {'detail': data}))
+            }
+        }
+
+        function transformError(e) {
+            if (e && e.stack && e.message) {
+                var message = e.message;
+
+                // Because the message about this error has a dynamic message, the back cannot assign a static error code
+                if (message.indexOf("RATE_LIMIT_REACHED") !== -1) {
+                    message = 'RATE_LIMIT_REACHED.Too many requests. Blocked due to rate limiting'
+                }
+
+                return {
+                    message: message
+                }
+            }
+
+            if (!e) {
+                return {
+                    message: 'Unknown error'
+                }
+            }
+
+            return e
+        }
+
+        function formatErrorMessage(e) {
+            if (e && e.stack && e.message) {
+                return e.message
+            }
+
+            if (!e) {
+                return 'No errors'
+            }
+
+            return 'Unknown error'
+        }
+    }
+
+    function captureException(e) {
+        try {
+            exceptionListener(e);
+        } catch (newExc) {
+            console.log(newExc);
+        }
+    }
+
+    return {
+        addExceptionListener: function (callbackFn) {
+            exceptionListener = callbackFn
+        },
+        addTrackEventListener: function (callbackFn) {
+            saveEventToTrack = callbackFn
+        },
+        setCountryParams: function (params) {
+            countryParams = params
+        },
+        initSdkV1: function (
+            baseApiPathParam,
+            ppButtonDomIdParam,
+            paypalScriptDataset,
+            credentials,
+            initDto,
+            currentScriptSrc,
+            initPaymentCallbackFn,
+        ) {
+            baseApiPath = baseApiPathParam.replace(/\/$/, ''); // rtrim last '/'
+            ppButtonDomId = ppButtonDomIdParam;
+            ppButtonElem = document.getElementById(ppButtonDomIdParam);
+
+            try {
+                var jsSdkUrl = 'https://www.paypal.com/sdk/js?integration-date=2024-09-01&client-id=' + credentials.clientId + '&components=buttons,funding-eligibility';
+                if (credentials.flow === vaultFlow) {
+                    jsSdkUrl += '&vault=true&intent=tokenize';
+                }
+
+                if (credentials.flow === checkoutFlow) {
+                    jsSdkUrl += '&intent=capture';
+                    jsSdkUrl += '&currency=' + initDto.currency;
+                }
+
+                userAction = initDto.paymentMethodData.userAction;
+
+                // https://developer.paypal.com/sdk/js/configuration/#link-commit
+                if (userAction === "continue") {
+                    jsSdkUrl += '&commit=false';
+                } else {
+                    jsSdkUrl += '&commit=true'; // default,
+                }
+
+                if (credentials.merchantId) {
+                    jsSdkUrl += '&merchant-id=' + credentials.merchantId;
+                }
+
+                includeScript(jsSdkUrl)
+                    .then(function (value) {
+                        initButton(
+                            credentials.flow,
+                            initPaymentCallbackFn,
+                            paypalScriptDataset,
+                            initDto.spOrderStatus,
+                            initDto.fraudnetSessionId,
+                            initDto.trackData,
+                            currentScriptSrc,
+                        )
+
+                        includeFraudNetScriptParams(credentials.sandbox, initDto.fraudnetSessionId)
+                            .then(function (value) {
+                                includeFraudNetScript().then(function (value) {
+                                    console.log('FraudNet loaded successfully')
+                                })
+                            });
+                    });
+
+            } catch (e) {
+                captureException(e)
+            }
+        }
+    };
+})();
+apmGatePayPalSdk.addExceptionListener(function (e) {
+    if (window.apmGateSentry !== 'undefined' && window.apmGateSentry) {
+        window.apmGateSentry.captureException(e);
+    }
+})
+
+apmGatePayPalSdk.addTrackEventListener(function (event, params, signature) {
+    _private_provider_track('event', event, params, signature)
+})
+apmGatePayPalSdk.setCountryParams({
+  "AD": {
+    "IsoCodeA3": "AND"
+  },
+  "AE": {
+    "IsoCodeA3": "ARE"
+  },
+  "AF": {
+    "IsoCodeA3": "AFG"
+  },
+  "AG": {
+    "IsoCodeA3": "ATG"
+  },
+  "AI": {
+    "IsoCodeA3": "AIA"
+  },
+  "AL": {
+    "IsoCodeA3": "ALB"
+  },
+  "AM": {
+    "IsoCodeA3": "ARM"
+  },
+  "AO": {
+    "IsoCodeA3": "AGO"
+  },
+  "AQ": {
+    "IsoCodeA3": "ATA"
+  },
+  "AR": {
+    "IsoCodeA3": "ARG"
+  },
+  "AS": {
+    "IsoCodeA3": "ASM"
+  },
+  "AT": {
+    "IsoCodeA3": "AUT"
+  },
+  "AU": {
+    "IsoCodeA3": "AUS"
+  },
+  "AW": {
+    "IsoCodeA3": "ABW"
+  },
+  "AX": {
+    "IsoCodeA3": "ALA"
+  },
+  "AZ": {
+    "IsoCodeA3": "AZE"
+  },
+  "BA": {
+    "IsoCodeA3": "BIH"
+  },
+  "BB": {
+    "IsoCodeA3": "BRB"
+  },
+  "BD": {
+    "IsoCodeA3": "BGD"
+  },
+  "BE": {
+    "IsoCodeA3": "BEL"
+  },
+  "BF": {
+    "IsoCodeA3": "BFA"
+  },
+  "BG": {
+    "IsoCodeA3": "BGR"
+  },
+  "BH": {
+    "IsoCodeA3": "BHR"
+  },
+  "BI": {
+    "IsoCodeA3": "BDI"
+  },
+  "BJ": {
+    "IsoCodeA3": "BEN"
+  },
+  "BL": {
+    "IsoCodeA3": "BLM"
+  },
+  "BM": {
+    "IsoCodeA3": "BMU"
+  },
+  "BN": {
+    "IsoCodeA3": "BRN"
+  },
+  "BO": {
+    "IsoCodeA3": "BOL"
+  },
+  "BQ": {
+    "IsoCodeA3": "BES"
+  },
+  "BR": {
+    "IsoCodeA3": "BRA"
+  },
+  "BS": {
+    "IsoCodeA3": "BHS"
+  },
+  "BT": {
+    "IsoCodeA3": "BTN"
+  },
+  "BV": {
+    "IsoCodeA3": "BVT"
+  },
+  "BW": {
+    "IsoCodeA3": "BWA"
+  },
+  "BY": {
+    "IsoCodeA3": "BLR"
+  },
+  "BZ": {
+    "IsoCodeA3": "BLZ"
+  },
+  "CA": {
+    "IsoCodeA3": "CAN"
+  },
+  "CC": {
+    "IsoCodeA3": "CCK"
+  },
+  "CD": {
+    "IsoCodeA3": "COD"
+  },
+  "CF": {
+    "IsoCodeA3": "CAF"
+  },
+  "CG": {
+    "IsoCodeA3": "COG"
+  },
+  "CH": {
+    "IsoCodeA3": "CHE"
+  },
+  "CI": {
+    "IsoCodeA3": "CIV"
+  },
+  "CK": {
+    "IsoCodeA3": "COK"
+  },
+  "CL": {
+    "IsoCodeA3": "CHL"
+  },
+  "CM": {
+    "IsoCodeA3": "CMR"
+  },
+  "CN": {
+    "IsoCodeA3": "CHN"
+  },
+  "CO": {
+    "IsoCodeA3": "COL"
+  },
+  "CR": {
+    "IsoCodeA3": "CRI"
+  },
+  "CU": {
+    "IsoCodeA3": "CUB"
+  },
+  "CV": {
+    "IsoCodeA3": "CPV"
+  },
+  "CW": {
+    "IsoCodeA3": "CUW"
+  },
+  "CX": {
+    "IsoCodeA3": "CXR"
+  },
+  "CY": {
+    "IsoCodeA3": "CYP"
+  },
+  "CZ": {
+    "IsoCodeA3": "CZE"
+  },
+  "DE": {
+    "IsoCodeA3": "DEU"
+  },
+  "DJ": {
+    "IsoCodeA3": "DJI"
+  },
+  "DK": {
+    "IsoCodeA3": "DNK"
+  },
+  "DM": {
+    "IsoCodeA3": "DMA"
+  },
+  "DO": {
+    "IsoCodeA3": "DOM"
+  },
+  "DZ": {
+    "IsoCodeA3": "DZA"
+  },
+  "EC": {
+    "IsoCodeA3": "ECU"
+  },
+  "EE": {
+    "IsoCodeA3": "EST"
+  },
+  "EG": {
+    "IsoCodeA3": "EGY"
+  },
+  "EH": {
+    "IsoCodeA3": "ESH"
+  },
+  "ER": {
+    "IsoCodeA3": "ERI"
+  },
+  "ES": {
+    "IsoCodeA3": "ESP"
+  },
+  "ET": {
+    "IsoCodeA3": "ETH"
+  },
+  "FI": {
+    "IsoCodeA3": "FIN"
+  },
+  "FJ": {
+    "IsoCodeA3": "FJI"
+  },
+  "FK": {
+    "IsoCodeA3": "FLK"
+  },
+  "FM": {
+    "IsoCodeA3": "FSM"
+  },
+  "FO": {
+    "IsoCodeA3": "FRO"
+  },
+  "FR": {
+    "IsoCodeA3": "FRA"
+  },
+  "GA": {
+    "IsoCodeA3": "GAB"
+  },
+  "GB": {
+    "IsoCodeA3": "GBR"
+  },
+  "GD": {
+    "IsoCodeA3": "GRD"
+  },
+  "GE": {
+    "IsoCodeA3": "GEO"
+  },
+  "GF": {
+    "IsoCodeA3": "GUF"
+  },
+  "GG": {
+    "IsoCodeA3": "GGY"
+  },
+  "GH": {
+    "IsoCodeA3": "GHA"
+  },
+  "GI": {
+    "IsoCodeA3": "GIB"
+  },
+  "GL": {
+    "IsoCodeA3": "GRL"
+  },
+  "GM": {
+    "IsoCodeA3": "GMB"
+  },
+  "GN": {
+    "IsoCodeA3": "GIN"
+  },
+  "GP": {
+    "IsoCodeA3": "GLP"
+  },
+  "GQ": {
+    "IsoCodeA3": "GNQ"
+  },
+  "GR": {
+    "IsoCodeA3": "GRC"
+  },
+  "GS": {
+    "IsoCodeA3": "SGS"
+  },
+  "GT": {
+    "IsoCodeA3": "GTM"
+  },
+  "GU": {
+    "IsoCodeA3": "GUM"
+  },
+  "GW": {
+    "IsoCodeA3": "GNB"
+  },
+  "GY": {
+    "IsoCodeA3": "GUY"
+  },
+  "HK": {
+    "IsoCodeA3": "HKG"
+  },
+  "HM": {
+    "IsoCodeA3": "HMD"
+  },
+  "HN": {
+    "IsoCodeA3": "HND"
+  },
+  "HR": {
+    "IsoCodeA3": "HRV"
+  },
+  "HT": {
+    "IsoCodeA3": "HTI"
+  },
+  "HU": {
+    "IsoCodeA3": "HUN"
+  },
+  "ID": {
+    "IsoCodeA3": "IDN"
+  },
+  "IE": {
+    "IsoCodeA3": "IRL"
+  },
+  "IL": {
+    "IsoCodeA3": "ISR"
+  },
+  "IM": {
+    "IsoCodeA3": "IMN"
+  },
+  "IN": {
+    "IsoCodeA3": "IND"
+  },
+  "IO": {
+    "IsoCodeA3": "IOT"
+  },
+  "IQ": {
+    "IsoCodeA3": "IRQ"
+  },
+  "IR": {
+    "IsoCodeA3": "IRN"
+  },
+  "IS": {
+    "IsoCodeA3": "ISL"
+  },
+  "IT": {
+    "IsoCodeA3": "ITA"
+  },
+  "JE": {
+    "IsoCodeA3": "JEY"
+  },
+  "JM": {
+    "IsoCodeA3": "JAM"
+  },
+  "JO": {
+    "IsoCodeA3": "JOR"
+  },
+  "JP": {
+    "IsoCodeA3": "JPN"
+  },
+  "KE": {
+    "IsoCodeA3": "KEN"
+  },
+  "KG": {
+    "IsoCodeA3": "KGZ"
+  },
+  "KH": {
+    "IsoCodeA3": "KHM"
+  },
+  "KI": {
+    "IsoCodeA3": "KIR"
+  },
+  "KM": {
+    "IsoCodeA3": "COM"
+  },
+  "KN": {
+    "IsoCodeA3": "KNA"
+  },
+  "KP": {
+    "IsoCodeA3": "PRK"
+  },
+  "KR": {
+    "IsoCodeA3": "KOR"
+  },
+  "KW": {
+    "IsoCodeA3": "KWT"
+  },
+  "KY": {
+    "IsoCodeA3": "CYM"
+  },
+  "KZ": {
+    "IsoCodeA3": "KAZ"
+  },
+  "LA": {
+    "IsoCodeA3": "LAO"
+  },
+  "LB": {
+    "IsoCodeA3": "LBN"
+  },
+  "LC": {
+    "IsoCodeA3": "LCA"
+  },
+  "LI": {
+    "IsoCodeA3": "LIE"
+  },
+  "LK": {
+    "IsoCodeA3": "LKA"
+  },
+  "LR": {
+    "IsoCodeA3": "LBR"
+  },
+  "LS": {
+    "IsoCodeA3": "LSO"
+  },
+  "LT": {
+    "IsoCodeA3": "LTU"
+  },
+  "LU": {
+    "IsoCodeA3": "LUX"
+  },
+  "LV": {
+    "IsoCodeA3": "LVA"
+  },
+  "LY": {
+    "IsoCodeA3": "LBY"
+  },
+  "MA": {
+    "IsoCodeA3": "MAR"
+  },
+  "MC": {
+    "IsoCodeA3": "MCO"
+  },
+  "MD": {
+    "IsoCodeA3": "MDA"
+  },
+  "ME": {
+    "IsoCodeA3": "MNE"
+  },
+  "MF": {
+    "IsoCodeA3": "MAF"
+  },
+  "MG": {
+    "IsoCodeA3": "MDG"
+  },
+  "MH": {
+    "IsoCodeA3": "MHL"
+  },
+  "MK": {
+    "IsoCodeA3": "MKD"
+  },
+  "ML": {
+    "IsoCodeA3": "MLI"
+  },
+  "MM": {
+    "IsoCodeA3": "MMR"
+  },
+  "MN": {
+    "IsoCodeA3": "MNG"
+  },
+  "MO": {
+    "IsoCodeA3": "MAC"
+  },
+  "MP": {
+    "IsoCodeA3": "MNP"
+  },
+  "MQ": {
+    "IsoCodeA3": "MTQ"
+  },
+  "MR": {
+    "IsoCodeA3": "MRT"
+  },
+  "MS": {
+    "IsoCodeA3": "MSR"
+  },
+  "MT": {
+    "IsoCodeA3": "MLT"
+  },
+  "MU": {
+    "IsoCodeA3": "MUS"
+  },
+  "MV": {
+    "IsoCodeA3": "MDV"
+  },
+  "MW": {
+    "IsoCodeA3": "MWI"
+  },
+  "MX": {
+    "IsoCodeA3": "MEX"
+  },
+  "MY": {
+    "IsoCodeA3": "MYS"
+  },
+  "MZ": {
+    "IsoCodeA3": "MOZ"
+  },
+  "NA": {
+    "IsoCodeA3": "NAM"
+  },
+  "NC": {
+    "IsoCodeA3": "NCL"
+  },
+  "NE": {
+    "IsoCodeA3": "NER"
+  },
+  "NF": {
+    "IsoCodeA3": "NFK"
+  },
+  "NG": {
+    "IsoCodeA3": "NGA"
+  },
+  "NI": {
+    "IsoCodeA3": "NIC"
+  },
+  "NL": {
+    "IsoCodeA3": "NLD"
+  },
+  "NO": {
+    "IsoCodeA3": "NOR"
+  },
+  "NP": {
+    "IsoCodeA3": "NPL"
+  },
+  "NR": {
+    "IsoCodeA3": "NRU"
+  },
+  "NU": {
+    "IsoCodeA3": "NIU"
+  },
+  "NZ": {
+    "IsoCodeA3": "NZL"
+  },
+  "OM": {
+    "IsoCodeA3": "OMN"
+  },
+  "PA": {
+    "IsoCodeA3": "PAN"
+  },
+  "PE": {
+    "IsoCodeA3": "PER"
+  },
+  "PF": {
+    "IsoCodeA3": "PYF"
+  },
+  "PG": {
+    "IsoCodeA3": "PNG"
+  },
+  "PH": {
+    "IsoCodeA3": "PHL"
+  },
+  "PK": {
+    "IsoCodeA3": "PAK"
+  },
+  "PL": {
+    "IsoCodeA3": "POL"
+  },
+  "PM": {
+    "IsoCodeA3": "SPM"
+  },
+  "PN": {
+    "IsoCodeA3": "PCN"
+  },
+  "PR": {
+    "IsoCodeA3": "PRI"
+  },
+  "PS": {
+    "IsoCodeA3": "PSE"
+  },
+  "PT": {
+    "IsoCodeA3": "PRT"
+  },
+  "PW": {
+    "IsoCodeA3": "PLW"
+  },
+  "PY": {
+    "IsoCodeA3": "PRY"
+  },
+  "QA": {
+    "IsoCodeA3": "QAT"
+  },
+  "RE": {
+    "IsoCodeA3": "REU"
+  },
+  "RO": {
+    "IsoCodeA3": "ROU"
+  },
+  "RS": {
+    "IsoCodeA3": "SRB"
+  },
+  "RU": {
+    "IsoCodeA3": "RUS"
+  },
+  "RW": {
+    "IsoCodeA3": "RWA"
+  },
+  "SA": {
+    "IsoCodeA3": "SAU"
+  },
+  "SB": {
+    "IsoCodeA3": "SLB"
+  },
+  "SC": {
+    "IsoCodeA3": "SYC"
+  },
+  "SD": {
+    "IsoCodeA3": "SDN"
+  },
+  "SE": {
+    "IsoCodeA3": "SWE"
+  },
+  "SG": {
+    "IsoCodeA3": "SGP"
+  },
+  "SH": {
+    "IsoCodeA3": "SHN"
+  },
+  "SI": {
+    "IsoCodeA3": "SVN"
+  },
+  "SJ": {
+    "IsoCodeA3": "SJM"
+  },
+  "SK": {
+    "IsoCodeA3": "SVK"
+  },
+  "SL": {
+    "IsoCodeA3": "SLE"
+  },
+  "SM": {
+    "IsoCodeA3": "SMR"
+  },
+  "SN": {
+    "IsoCodeA3": "SEN"
+  },
+  "SO": {
+    "IsoCodeA3": "SOM"
+  },
+  "SR": {
+    "IsoCodeA3": "SUR"
+  },
+  "SS": {
+    "IsoCodeA3": "SSD"
+  },
+  "ST": {
+    "IsoCodeA3": "STP"
+  },
+  "SV": {
+    "IsoCodeA3": "SLV"
+  },
+  "SX": {
+    "IsoCodeA3": "SXM"
+  },
+  "SY": {
+    "IsoCodeA3": "SYR"
+  },
+  "SZ": {
+    "IsoCodeA3": "SWZ"
+  },
+  "TC": {
+    "IsoCodeA3": "TCA"
+  },
+  "TD": {
+    "IsoCodeA3": "TCD"
+  },
+  "TF": {
+    "IsoCodeA3": "ATF"
+  },
+  "TG": {
+    "IsoCodeA3": "TGO"
+  },
+  "TH": {
+    "IsoCodeA3": "THA"
+  },
+  "TJ": {
+    "IsoCodeA3": "TJK"
+  },
+  "TK": {
+    "IsoCodeA3": "TKL"
+  },
+  "TL": {
+    "IsoCodeA3": "TLS"
+  },
+  "TM": {
+    "IsoCodeA3": "TKM"
+  },
+  "TN": {
+    "IsoCodeA3": "TUN"
+  },
+  "TO": {
+    "IsoCodeA3": "TON"
+  },
+  "TR": {
+    "IsoCodeA3": "TUR"
+  },
+  "TT": {
+    "IsoCodeA3": "TTO"
+  },
+  "TV": {
+    "IsoCodeA3": "TUV"
+  },
+  "TW": {
+    "IsoCodeA3": "TWN"
+  },
+  "TZ": {
+    "IsoCodeA3": "TZA"
+  },
+  "UA": {
+    "IsoCodeA3": "UKR"
+  },
+  "UG": {
+    "IsoCodeA3": "UGA"
+  },
+  "UM": {
+    "IsoCodeA3": "UMI"
+  },
+  "US": {
+    "IsoCodeA3": "USA"
+  },
+  "UY": {
+    "IsoCodeA3": "URY"
+  },
+  "UZ": {
+    "IsoCodeA3": "UZB"
+  },
+  "VA": {
+    "IsoCodeA3": "VAT"
+  },
+  "VC": {
+    "IsoCodeA3": "VCT"
+  },
+  "VE": {
+    "IsoCodeA3": "VEN"
+  },
+  "VG": {
+    "IsoCodeA3": "VGB"
+  },
+  "VI": {
+    "IsoCodeA3": "VIR"
+  },
+  "VN": {
+    "IsoCodeA3": "VNM"
+  },
+  "VU": {
+    "IsoCodeA3": "VUT"
+  },
+  "WF": {
+    "IsoCodeA3": "WLF"
+  },
+  "WS": {
+    "IsoCodeA3": "WSM"
+  },
+  "YE": {
+    "IsoCodeA3": "YEM"
+  },
+  "YT": {
+    "IsoCodeA3": "MYT"
+  },
+  "ZA": {
+    "IsoCodeA3": "ZAF"
+  },
+  "ZM": {
+    "IsoCodeA3": "ZMB"
+  },
+  "ZW": {
+    "IsoCodeA3": "ZWE"
+  }
+})
+
+var paypalButton = 'paypal-button';
+
+// dataset with styles
+var paypalScriptDataset = {};
+if (document.currentScript && document.currentScript.dataset) {
+    paypalScriptDataset = document.currentScript.dataset;
+}
+
+// Script src for tracking
+var currentScriptSrc = '';
+if (document.currentScript) {
+    currentScriptSrc = document.currentScript.src;
+}
+
+var initDto = {
+    currency: 'USD',
+    paymentMethodData: {
+        userAction: 'pay_now'
+    },
+    spOrderStatus: 'created',
+    fraudnetSessionId: 'pay_ses_1pa2gxgv4zq',
+    trackData: {
+        entityName: 'pay_session_id',
+        entityValue: 'pay_ses_1pa2gxgv4zq',
+        signature: '6cc67b24f5ae65dbc36023ad3e16a9169f0b09f3aa4340bc0c2a57c6f5c53310'
+    }
+}
+
+var credentials = {
+    clientId: 'AeV3KGZwTQfCU0CbnVEk6h9grYjp_Fh7P_Ci2Xn7lGdgV5QeffNFLagz3K6sStIdWzQYMuhA\u002D1f0517h',
+    merchantId: '',
+    flow: 'vault',
+    sandbox: false,
+}
+
+var apmGateBaseApiPath = 'https://gate.solidgate.com/';
+
+var initPaymentCallbackFn = function () {
+    return new Promise(function (resolve, reject) {
+        // in this place, can be implemented asynchronous payment creation at an apm-gate
+        resolve({
+            apmGateToken: 'fc27c5dcdbc94a42aec554ad196aa1006827c531'
+        });
+    })
+};
+
+var element = document.getElementById(paypalButton);
+if (element) {
+    if (element.innerHTML != "") {
+        element.innerHTML = "";
+    }
+    apmGatePayPalSdk.initSdkV1(
+        apmGateBaseApiPath,
+        paypalButton,
+        paypalScriptDataset,
+        credentials,
+        initDto,
+        currentScriptSrc,
+        initPaymentCallbackFn,
+    );
+} else {
+    var observer = new MutationObserver(function (mutationList, obsrvr) {
+        var checkElement = document.getElementById(paypalButton);
+
+        if (checkElement) {
+            apmGatePayPalSdk.initSdkV1(
+                apmGateBaseApiPath,
+                paypalButton,
+                paypalScriptDataset,
+                credentials,
+                initDto,
+                currentScriptSrc,
+                initPaymentCallbackFn,
+            );
+            obsrvr.disconnect(); // stop observing
+            return;
+        }
+    });
+
+    var parentElement = document.querySelector("body"); // use parent div which is already present in DOM to maximise efficiency
+
+    observer.observe(parentElement, {
+        // for properties details: https://developer.mozilla.org/en-US/docs/Web/API/MutationObserverInit
+        childList: true,
+        subtree: true
+    });
+}
