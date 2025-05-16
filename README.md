@@ -28,10 +28,10 @@ Bem-vindo ao meu portfólio! Aqui você encontrará um pouco sobre mim, meus pri
 
 ## 📸 Imagens
 
-![Capa do portfólio desktop](./assets/capa_desktop.png)  
+![Capa do portfólio desktop](src/assets/capa_desktop.png)  
 _Preview do site em desktop_
 
-![Capa do portfólio mobile](./assets/capa_mobile.png)  
+![Capa do portfólio mobile](src/assets/capa_mobile.png)  
 _Preview do site em mobile_
 
 ---
