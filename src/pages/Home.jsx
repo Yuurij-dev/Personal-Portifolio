@@ -38,7 +38,8 @@ function Home() {
         revealContent('.inputform2','bottom', '100px', '400', '1000'),
         revealContent('.inputform3','bottom', '100px', '600', '1000'),
         revealContent('.inputform4','bottom', '100px', '800', '1000'),
-        revealContent('.inputform5','bottom', '100px', '1000', '1000')
+        revealContent('.inputform5','bottom', '100px', '1000', '1000'),
+        revealContent('.sucesso-form','top', '100px', '0', '1000')
 
   }, []);
 
