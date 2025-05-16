@@ -1,32 +1,28 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 module.exports = async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(405).send('Método não permitido');
-  }
+  if (req.method !== "POST") return res.status(405).end();
 
   const { to, subject, message } = req.body;
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
   });
 
-  const mailOptions = {
-    from: `"Portfólio" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    text: message,
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
-    return res.status(200).send('Email enviado com sucesso!');
+    await transporter.sendMail({
+      from: `"Portfólio" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      text: message,
+    });
+    res.status(200).send("Email enviado com sucesso!");
   } catch (error) {
-    console.error('Erro ao enviar e-mail:', error);
-    return res.status(500).send('Erro ao enviar o email.');
+    console.error(error);
+    res.status(500).send("Erro ao enviar o email.");
   }
 };
