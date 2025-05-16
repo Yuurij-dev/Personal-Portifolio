@@ -50,6 +50,7 @@ function Home() {
 
   const [isSending, setIsSending] = useState(false);
   const [showSucessMessage, setShowSucessMessage] = useState(false)
+  const [showSErrorMessage, setShowErrorMessage] = useState(false)
 
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value});
@@ -72,13 +73,14 @@ function Home() {
         })
       });
 
-      const text = await response.text();
-
       if(response.ok){
         setShowSucessMessage(true);
+        setShowErrorMessage(false)
         setFormData({ nome: '', email: '', mensagem: '' });
       }else{
         throw new Error("Falha ao enviar e-mail");
+        setShowErrorMessage(true)
+        setShowSucessMessage(false)
       }
     } catch (error) {
       console.error("Erro ao enviar e-mail:", error);
@@ -222,7 +224,13 @@ function Home() {
 
               {showSucessMessage && (
                 <div className='sucesso-form max-w-[500px] w-full h-[50px] flex items-center  border-l-8 rounded border-green-400 bg-green-200 px-4'>
-                  <span className='text-black font-bold'>Email enviado com sucesso</span>
+                  <span className='text-black font-bold'>E-mail enviado com sucesso!</span>
+                </div>
+              )}
+
+              {showSErrorMessage && (
+                <div className='erro-form max-w-[500px] w-full h-[50px] flex items-center  border-l-8 rounded border-red-400 bg-red-200 px-4'>
+                  <span className='text-black font-bold'>Erro ao enviar E-mail!</span>
                 </div>
               )}
 
