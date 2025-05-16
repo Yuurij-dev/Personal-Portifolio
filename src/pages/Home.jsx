@@ -47,6 +47,7 @@ function Home() {
     email: '',
     mensagem: ''
   })
+  const [isSending, setIsSending] = useState(false);
 
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value});
@@ -54,6 +55,7 @@ function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSending(true)
     
     try {
       const response = await fetch("/api/index.js", {
@@ -62,7 +64,7 @@ function Home() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          to: "yuriestudar21@gmail.com", // pode ser fixo ou vindo do form
+          to: "yuriestudar21@gmail.com", 
           subject: `Mensagem de ${formData.nome} - ${formData.email}`,
           message: formData.mensagem
         })
@@ -73,6 +75,8 @@ function Home() {
     } catch (error) {
       console.error("Erro ao enviar e-mail:", error);
       alert("Falha ao enviar. Tente novamente.");
+    } finally {
+      setIsSending(false)
     }
   };
 
@@ -211,7 +215,7 @@ function Home() {
                 {/* <input className='inputform3 w-full max-w-[500px]' name='phone'  type="text"  placeholder='Telefone'/> */}
                 <textarea name="mensagem" value={formData.mensagem} onChange={handleChange} className='inputform4 w-full max-w-[500px] area resize-none' required type="text" rows="4" placeholder='Sua Mensagem'/>               
 
-                <button type='submit' className='inputform5 buttonForm w-full max-w-[200px] bg-white text-black font-bold text-2xl cursor-pointer'>Enviar</button>
+                <button type='submit' disabled={isSending} className='inputform5 buttonForm w-full max-w-[200px] bg-white text-black font-bold text-2xl cursor-pointer'>{isSending ? 'Enviando...' : 'Enviar'}</button>
                 
             </form>
         </section>
