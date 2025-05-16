@@ -28,8 +28,11 @@ Bem-vindo ao meu portfólio! Aqui você encontrará um pouco sobre mim, meus pri
 
 ## 📸 Imagens
 
-![Capa do portfólio](https://imgur.com/a/Bvbcdv6)  
+![Capa do portfólio desktop](./assets/capa_desktop.png)  
 _Preview do site em desktop_
+
+![Capa do portfólio mobile](./assets/capa_mobile.png)  
+_Preview do site em mobile_
 
 ---
 
