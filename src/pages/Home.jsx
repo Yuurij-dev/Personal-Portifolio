@@ -56,7 +56,7 @@ function Home() {
     e.preventDefault();
     
     try {
-      const response = await fetch("/api/send", {
+      const response = await fetch("/api/index.js", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
