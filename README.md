@@ -1,12 +1,42 @@
-# React + Vite
+# 🚀 Portfólio Pessoal – Yuri Jesus
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bem-vindo ao meu portfólio! Aqui você encontrará um pouco sobre mim, meus principais projetos, habilidades e formas de contato. O site foi desenvolvido com foco em desempenho, responsividade e clareza na apresentação dos conteúdos.
 
-Currently, two official plugins are available:
+🔗 **Acesse o portfólio online:**  
+[https://personal-portifolio-git-main-yuurij-devs-projects.vercel.app](https://personal-portifolio-git-main-yuurij-devs-projects.vercel.app)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🖥️ Tecnologias Utilizadas
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **React.js** – Biblioteca para construção da interface
+- **Tailwind CSS** – Framework de CSS utilitário para estilização rápida e responsiva
+- **Email API nodemailer (via rota personalizada)** – Para envio de mensagens no formulário de contato
+- **JavaScript (ES6+)**
+- **Vite** – Ferramenta de build e desenvolvimento
+
+---
+
+## ✨ Funcionalidades
+
+- 💬 **Formulário de contato funcional** com feedback visual
+- 📱 **Responsividade completa** em todos os dispositivos
+- 🎨 Design moderno e minimalista com boas práticas de UI
+- 📂 Seção de projetos com preview, descrição e tecnologias usadas
+
+---
+
+## 📸 Imagens
+
+![Capa do portfólio](https://imgur.com/a/Bvbcdv6)  
+_Preview do site em desktop_
+
+---
+
+## 📁 Como rodar localmente
+
+1. Clone o repositório:
+
+```bash
+git clone https://github.com/yuurij-dev/personal-portifolio.git
+```
