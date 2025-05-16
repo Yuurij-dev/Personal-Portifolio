@@ -137,7 +137,7 @@ function Home() {
                 </div>
 
                 <div className="text-me w-1/2">
-                    <h1 className='font-bold text-4xl'>Yuri</h1>
+                    <h1 className='font-bold text-4xl'>Yuri de Jesus</h1>
                     <span className='bg-white text-black text-3xl'>Front-End Developer</span>
                     <p className='p-1'>
                         Sou um desenvolvedor Front-End apaixonado por criar interfaces intuitivas, modernas e acessíveis. 
@@ -157,17 +157,17 @@ function Home() {
 
                     <ul className="social-links flex gap-2.5 text-5xl">
                       <li>
-                        <a href="#" className="transition-all duration-300 hover:text-6xl">
+                        <a href="https://github.com/Yuurij-dev" target="_blank" rel="noopener noreferrer" className="transition-all duration-300 hover:text-6xl">
                           <i className="fa-brands fa-github"></i>
                         </a>
                       </li>
                       <li>
-                        <a href="#" className="transition-all duration-300 hover:text-6xl">
+                        <a href="https://www.linkedin.com/in/yuri-de-jesus-431275212/" target="_blank" rel="noopener noreferrer" className="transition-all duration-300 hover:text-6xl">
                           <i className="fa-brands fa-linkedin"></i>
                         </a>
                       </li>
                       <li>
-                        <a href="#" className="transition-all duration-300 hover:text-6xl">
+                        <a href="https://www.instagram.com/yjg.dev" target="_blank" rel="noopener noreferrer" className="transition-all duration-300 hover:text-6xl">
                           <i className="fa-brands fa-instagram"></i>
                         </a>
                       </li>
@@ -261,17 +261,17 @@ function Home() {
 
               <ul className="social-links flex gap-2.5 text-5xl">
                 <li>
-                  <a href="#" className="transition-all duration-300 hover:text-6xl">
+                  <a href="https://github.com/Yuurij-dev" target="_blank" rel="noopener noreferrer"  className="transition-all duration-300 hover:text-6xl">
                     <i className="fa-brands fa-github"></i>
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="transition-all duration-300 hover:text-6xl">
+                  <a href="https://www.linkedin.com/in/yuri-de-jesus-431275212/" target="_blank" rel="noopener noreferrer" className="transition-all duration-300 hover:text-6xl">
                     <i className="fa-brands fa-linkedin"></i>
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="transition-all duration-300 hover:text-6xl">
+                  <a href="https://www.instagram.com/yjg.dev" target="_blank" rel="noopener noreferrer" className="transition-all duration-300 hover:text-6xl">
                     <i className="fa-brands fa-instagram"></i>
                   </a>
                 </li>
