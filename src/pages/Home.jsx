@@ -1,15 +1,16 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import './styles.css'
 
 import dashboardProjeto from '../assets/projeto-dashboard.png'
 import calcProjeto from '../assets/projeto-calc.png'
 import formProjeto from '../assets/projeto-fomr.png'
 import Logo from '../assets/logo2.png'
-import MePhoto from '../assets/me3.png'
 
 import { TextEffect, IconSkill, CardProjetos} from '../components/index'
 
 import { revealContent } from '../config/scrollRevealConfig';
+
+ 
 function Home() {
     useEffect(() => {
         // Header
@@ -20,10 +21,10 @@ function Home() {
         // Sobre
         revealContent('.text-me h1','right', '90px', '0', '1000'),
         revealContent('.text-me span','right', '90px', '500', '1000'),
-        revealContent('.text-me .p-1','right', '90px', '1000', '1000'),
-        revealContent('.text-me .p-2','right', '90px', '1500', '1000'),
-        revealContent('.text-me .p-3','right', '90px', '2000', '1000'),
-        revealContent('.text-me .social-links','right', '90px', '2500', '1000'),
+        revealContent('.text-me .p-1','right', '90px', '700', '1000'),
+        revealContent('.text-me .p-2','right', '90px', '900', '1000'),
+        revealContent('.text-me .p-3','right', '90px', '1100', '1000'),
+        revealContent('.text-me .social-links','right', '90px', '1300', '1000'),
         revealContent('.img-me-box','left', '90px', '0', '1000'),
 
         // Skills
@@ -40,6 +41,41 @@ function Home() {
         revealContent('.inputform5','bottom', '100px', '1000', '1000')
 
   }, []);
+
+  const [formData, setFormData] = useState({
+    nome: '',
+    email: '',
+    mensagem: ''
+  })
+
+  const handleChange = (e) => {
+    setFormData({...formData, [e.target.name]: e.target.value});
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch("http://localhost:3001/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          to: "yuriestudar21@gmail.com", // pode ser fixo ou vindo do form
+          subject: `Mensagem de ${formData.nome} - ${formData.email}`,
+          message: formData.mensagem
+        })
+      });
+
+      const text = await response.text();
+      alert(text);
+    } catch (error) {
+      console.error("Erro ao enviar e-mail:", error);
+      alert("Falha ao enviar. Tente novamente.");
+    }
+  };
+
   return (
     <div>
       <header id='home' className='w-full flex flex-col items-center'>
@@ -169,13 +205,11 @@ function Home() {
                 <h1 className='text-5xl font-bold'>Fala <span className='text-black bg-white'>Comigo</span></h1>
             </div>
 
-            <form className='formulario w-full flex gap-2.5 flex-col items-center justify-center'>
-                <input className='inputform1 w-full max-w-[500px]' name='name' type="text" required placeholder='Nome'/>
-                <input className='inputform2 w-full max-w-[500px]' name="email" type="email" required placeholder='Email'/>
-                <input className='inputform3 w-full max-w-[500px]' name='phone' type="text"  placeholder='Telefone'/>
-                <textarea name="message" className='inputform4 w-full max-w-[500px] area resize-none' required type="text" rows="4" placeholder='Sua Mensagem'/>
-
-                
+            <form onSubmit={handleSubmit} method="POST" className='formulario w-full flex gap-2.5 flex-col items-center justify-center'>
+                <input className='inputform1 w-full max-w-[500px]' name='nome' value={formData.nome} onChange={handleChange} type="text" required placeholder='Nome'/>
+                <input className='inputform2 w-full max-w-[500px]' name="email" value={formData.email} onChange={handleChange} type="email" required placeholder='Email'/>
+                {/* <input className='inputform3 w-full max-w-[500px]' name='phone'  type="text"  placeholder='Telefone'/> */}
+                <textarea name="mensagem" value={formData.mensagem} onChange={handleChange} className='inputform4 w-full max-w-[500px] area resize-none' required type="text" rows="4" placeholder='Sua Mensagem'/>               
 
                 <button type='submit' className='inputform5 buttonForm w-full max-w-[200px] bg-white text-black font-bold text-2xl cursor-pointer'>Enviar</button>
                 
