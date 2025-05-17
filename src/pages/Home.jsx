@@ -4,6 +4,8 @@ import './styles.css'
 import dashboardProjeto from '../assets/projeto-dashboard.png'
 import calcProjeto from '../assets/projeto-calc.png'
 import formProjeto from '../assets/projeto-fomr.png'
+import qrCodeGenerator from '../assets/qrcode.png'
+
 import Logo from '../assets/logo2.png'
 
 import { TextEffect, IconSkill, CardProjetos} from '../components/index'
@@ -213,6 +215,7 @@ function Home() {
                 <CardProjetos link="https://gerenciador-de-produtos-lime.vercel.app/" title="Gerenciador de Produtos" img={dashboardProjeto} p="Front-End completo de um sistema completo com cadastro de produtos e usuários, controle de estoque, edição e remoção de itens. Possui dashboard com gráficos de vendas e frequência de usuários."/>
                 <CardProjetos link="https://age-calculator-bice-seven.vercel.app/" title="Calculadora de Idade" img={calcProjeto} p="Aplicação com layout moderno e responsivo, que calcula a idade exata em anos, meses e dias a partir da data de nascimento. Interface clean, com foco na experiência do usuário."/>
                 <CardProjetos link="https://form-community-of-developers.vercel.app/" title="Community of Developers" img={formProjeto} p="Formulário com design moderno e responsivo, onde o usuário seleciona sua stack, nível de experiência e revisa todas as informações antes de enviar. Possui validação robusta e feedbacks visuais que garantem uma ótima experiência de uso."/>
+                <CardProjetos link="https://qr-code-generator-mu-two.vercel.app/" title="Gerador de QR Code" img={qrCodeGenerator} p="Um gerador de QR Code simples, rápido e intuitivo, desenvolvido com HTML, CSS e JavaScript. Permite criar QR Codes personalizados a partir de qualquer texto ou link, com visualização em tempo real e opção de download da imagem. Ideal para facilitar o compartilhamento de informações de forma prática e acessível."/>
 
             </div>
         </section>
