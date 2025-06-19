@@ -6,6 +6,9 @@ import calcProjeto from '../assets/projeto-calc.png'
 import formProjeto from '../assets/projeto-fomr.png'
 import qrCodeGenerator from '../assets/qrcode.png'
 import alaradoProjeto from '../assets/projeto-alarado.png'
+import financas from '../assets/financas.jfif'
+import clima from '../assets/clima.png'
+import lua from '../assets/lua.webp'
 
 import Logo from '../assets/logo2.png'
 
@@ -29,6 +32,8 @@ function Home() {
         revealContent('.text-me .p-3','right', '90px', '1100', '1000'),
         revealContent('.text-me .social-links','right', '90px', '1300', '1000'),
         revealContent('.img-me-box','left', '90px', '0', '1000'),
+        revealContent('.fullstack','tight', '90px', '0', '1200'),
+        revealContent('.sobre-text','right', '90px', '0', '1400'),
 
         // Skills
         revealContent('.icons-skill','top', '100px','500','1000'),
@@ -42,7 +47,10 @@ function Home() {
         revealContent('.inputform3','bottom', '100px', '600', '1000'),
         revealContent('.inputform4','bottom', '100px', '800', '1000'),
         revealContent('.inputform5','bottom', '100px', '1000', '1000'),
-        revealContent('.sucesso-form','top', '100px', '0', '1000')
+        revealContent('.sucesso-form','top', '100px', '0', '1000'),
+
+        // Footer
+        revealContent('#footer','top', '100px', '0', '1000')
 
   }, []);
 
@@ -98,6 +106,10 @@ function Home() {
     <div>
       <header id='home' className='w-full flex flex-col items-center'>
 
+        <div className='lua-box'>
+          <img src={lua} alt="lua" />
+        </div>
+
         <nav className='w-full flex justify-between items-center'>
           
           <div className="logo flex items-center gap-2.5">
@@ -113,14 +125,17 @@ function Home() {
           </ul>
 
           <a href="/Curriculo_Yuri_jesus.pdf" download>
-            <button  className='border-white border cursor-pointer text-md hover:bg-white hover:text-black '>Baixar CV</button>
+            <button  className='button-cv border-white border cursor-pointer text-md font-bold hover:bg-white hover:text-black '>Baixar CV</button>
           </a>
         </nav>
         
-        <div className="content-header flex flex-col w-full max-w-2xl items-center justify-center text-center">
+        <div className="content-header flex flex-col gap-4 w-full max-w-2xl items-center justify-center text-center">
           <TextEffect text='Yuri'/>
-          <p className='sub-text text-3xl'>Entregando Soluções Frontend Personalizadas <span className='bg-white text-black'>que se Destacam.</span></p>
-          
+          <p className='sub-text text-3xl'><span className='bg-white text-black font-bold'>Full-Stack</span> Developer</p>
+
+          <a href="/Curriculo_Yuri_jesus.pdf" download>
+            <button  className='button-cv border-white border cursor-pointer text-md font-bold hover:bg-white hover:text-black '>Baixar CV</button>
+          </a>
         </div>
         
         
@@ -133,51 +148,15 @@ function Home() {
                 <h1 className='text-5xl font-bold'>Sobre mim</h1>
             </div>
 
-            <div className='sobre-content w-full flex gap-8 '>
-                {/* <div className="img-me-box w-1/2 bg-red-300 flex items-center justify-center rounded overflow-hidden">
-                  <img src={MePhoto} alt="" className="w-full h-full object-cover" />
-                </div> */}
+            <div className='sobre-content w-full flex items-center justify-center '>
 
-                <div className="img-me-box w-1/2 h-[700px] bg-red-300 ">
-
-                </div>
-
-                <div className="text-me w-1/2">
+                <div className="text-me w-full">
                     <h1 className='font-bold text-4xl'>Yuri de Jesus</h1>
-                    <span className='bg-white text-black text-3xl'>Front-End Developer</span>
-                    <p className='p-1'>
-                        Sou um desenvolvedor Front-End apaixonado por criar interfaces intuitivas, modernas e acessíveis. 
-                        Atualmente estou cursando Análise e Desenvolvimento de Sistemas e busco constantemente 
-                        evoluir tanto tecnicamente quanto como profissional.      
-                    </p>
-                    <br />
-                    <p className='p-2'>
-                      Tenho experiência com tecnologias como HTML, CSS, JavaScript e React, e estou sempre explorando 
-                        novas ferramentas e práticas para entregar projetos eficientes e com ótima usabilidade. 
-                        Acredito que o design aliado a um bom código transforma ideias em experiências reais.
-                    </p>
-                    <br />
-                    <p className='p-3'>
-                      Estou pronto para contribuir com soluções criativas, trabalhar em equipe e aprender algo novo todos os dias.
-                    </p>
-
-                    <ul className="social-links flex gap-2.5 text-5xl">
-                      <li>
-                        <a href="https://github.com/Yuurij-dev" target="_blank" rel="noopener noreferrer" className="transition-all duration-300 hover:text-6xl">
-                          <i className="fa-brands fa-github"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://www.linkedin.com/in/yuri-de-jesus-431275212/" target="_blank" rel="noopener noreferrer" className="transition-all duration-300 hover:text-6xl">
-                          <i className="fa-brands fa-linkedin"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://www.instagram.com/yjg.dev" target="_blank" rel="noopener noreferrer" className="transition-all duration-300 hover:text-6xl">
-                          <i className="fa-brands fa-instagram"></i>
-                        </a>
-                      </li>
-                    </ul>
+                    <p className='fullstack text-3xl'><span className='bg-white text-black font-bold'>Full-Stack</span> Developer</p>
+                    <p className='sobre-text'>
+                    Sou estudante de Análise e Desenvolvimento de Sistemas, com foco em me tornar um desenvolvedor cada vez mais completo e preparado para os desafios do mercado.
+                    Tenho facilidade para aprender novas tecnologias, resolver problemas e trabalhar em equipe, sempre buscando entregar soluções funcionais e com uma boa experiência para o usuário.
+                    Me destaco pela dedicação, proatividade e vontade constante de evoluir. Acredito que tecnologia vai muito além do código — é sobre entender o problema, colaborar com o time e construir algo que realmente faça a diferença.</p>
                 </div>
             </div>
         </section>
@@ -213,6 +192,8 @@ function Home() {
             </div>
 
             <div className='grid-projetos w-full grid grid-cols-3 gap-8 justify-items-center '>
+                <CardProjetos link="https://controle-de-financas-yuurij.netlify.app/dashboard" title="Controle de Finaças" img={financas} p="Dashboard de Controle Financeiro, uma aplicação web que permite organizar receitas e despesas de forma simples e intuitiva."/>
+                <CardProjetos link="https://weather-web-git-main-yuurij-devs-projects.vercel.app/" title="Previsão de Clima" img={clima} p="Previsão de Clima um projeto com foco em integração de APIs e boas práticas de desenvolvimento front-end. A aplicação consome dados da API OpenWeatherMap e exibe a previsão do tempo de forma clara e responsiva."/>
                 <CardProjetos link="https://gerenciador-de-produtos-lime.vercel.app/" title="Gerenciador de Produtos" img={dashboardProjeto} p="Front-End completo de um sistema completo com cadastro de produtos e usuários, controle de estoque, edição e remoção de itens. Possui dashboard com gráficos de vendas e frequência de usuários."/>
                 <CardProjetos link="https://qr-code-generator-mu-two.vercel.app/" title="Gerador de QR Code" img={qrCodeGenerator} p="Um gerador de QR Code simples, rápido e intuitivo, desenvolvido com HTML, CSS e JavaScript. Permite criar QR Codes personalizados a partir de qualquer texto ou link, com visualização em tempo real e opção de download da imagem. Ideal para facilitar o compartilhamento de informações de forma prática e acessível."/>
                 <CardProjetos link="https://alarado-home-page.vercel.app/" title="Alarado Home Page" img={alaradoProjeto} p="Landing page moderna com design responsivo, foco em UI/UX e layout clean, ideal para apresentar produtos ou serviços de forma clara e atrativa."/>
@@ -255,68 +236,27 @@ function Home() {
 
         
       </main>
-      <footer className='w-full max-w-[] border-t border-t-white flex flex-wrap gap-5 justify-between'>
+      <footer id='footer' className='w-full border-t border-t-neutral-800 flex items-center justify-center flex-col gap-2.5'>
           <div className='personal-info-footer'>
-              <div className=" max-w-[300px]">
-
-                <div className='logo-footer flex items-center gap-2.5'>
-                  <img className='w-[50px]' src={Logo} alt="logo" />
-                  <h1 className='font-bold text-2xl'>Yuri</h1>  
-                </div> 
-
-                <span>Entregando Soluções Frontend Personalizadas que se Destacam.</span>
-              </div>
-
               <ul className="social-links flex gap-2.5 text-5xl">
                 <li>
                   <a href="https://github.com/Yuurij-dev" target="_blank" rel="noopener noreferrer"  className="transition-all duration-300 hover:text-6xl">
-                    <i className="fa-brands fa-github"></i>
+                    <i className="text-[50px] fa-brands fa-github"></i>
                   </a>
                 </li>
                 <li>
                   <a href="https://www.linkedin.com/in/yuri-de-jesus-431275212/" target="_blank" rel="noopener noreferrer" className="transition-all duration-300 hover:text-6xl">
-                    <i className="fa-brands fa-linkedin"></i>
+                    <i className="text-[50px] fa-brands fa-linkedin"></i>
                   </a>
                 </li>
                 <li>
                   <a href="https://www.instagram.com/yjg.dev" target="_blank" rel="noopener noreferrer" className="transition-all duration-300 hover:text-6xl">
-                    <i className="fa-brands fa-instagram"></i>
+                    <i className="text-[50px] fa-brands fa-instagram"></i>
                   </a>
                 </li>
               </ul>
-          </div>
-          
-          <div>
-            <h1 className='font-bold text-2xl '>Skill</h1>
-            <ul className='list-disc'>
-              <li><span className='hover-underline cursor-default'>React JS</span></li>
-              <li><span className="hover-underline cursor-default">Node JS</span></li>
-              <li><span className="hover-underline cursor-default">JavaScript</span></li>
-              <li><span className="hover-underline cursor-default">TypeScript</span></li>
-              <li><span className="hover-underline cursor-default">TailWind CSS</span></li>
-            </ul>
-          </div>
-
-          <div>
-            <h1 className='font-bold text-2xl '>Tecnologias</h1>
-            <ul className='list-disc '>
-              <li><span className="hover-underline cursor-default">GIT</span></li>
-              <li><span className="hover-underline cursor-default">GitHub</span></li>
-              <li><span className="hover-underline cursor-default">Postgress</span></li>
-              <li><span className="hover-underline cursor-default">Figma</span></li>
-            </ul>
-          </div>
-
-          <div>
-            <h1 className='font-bold text-2xl'>Menu</h1>
-            <ul className='list-disc '>
-              <li><a href='#home' className="hover-underline cursor-pointer">Home</a></li>
-              <li><a href='#sobre' className="hover-underline cursor-pointer">Sobre</a></li>
-              <li><a href='#habilidades' className="hover-underline cursor-pointer">Habilidades</a></li>
-              <li><a href='#projetos' className="hover-underline cursor-pointer">Projetos</a></li>
-              <li><a href='#contatos' className="hover-underline cursor-pointer">Contatos</a></li>
-            </ul>
-          </div>
+          </div> 
+          <h1 className='text-2xl'>Social Links</h1>
       </footer>
     </div>
   )
