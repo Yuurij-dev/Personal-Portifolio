@@ -90,9 +90,9 @@ function Home() {
         setShowErrorMessage(false)
         setFormData({ nome: '', email: '', mensagem: '' });
       }else{
-        throw new Error("Falha ao enviar e-mail");
         setShowErrorMessage(true)
         setShowSucessMessage(false)
+        throw new Error("Falha ao enviar e-mail");
       }
     } catch (error) {
       console.error("Erro ao enviar e-mail:", error);
