@@ -9,6 +9,10 @@ import alaradoProjeto from '../assets/projeto-alarado.png'
 import financas from '../assets/financas.jfif'
 import clima from '../assets/clima.png'
 import lua from '../assets/lua.webp'
+import dogProjeto from '../assets/projeto-dog.png'
+import vitaMedProjeto from '../assets/vitamed-projeto.png'
+
+
 
 import Logo from '../assets/logo2.png'
 
@@ -199,6 +203,8 @@ function Home() {
                 <CardProjetos link="https://alarado-home-page.vercel.app/" title="Alarado Home Page" img={alaradoProjeto} p="Landing page moderna com design responsivo, foco em UI/UX e layout clean, ideal para apresentar produtos ou serviços de forma clara e atrativa."/>
                 <CardProjetos link="https://age-calculator-bice-seven.vercel.app/" title="Calculadora de Idade" img={calcProjeto} p="Aplicação com layout moderno e responsivo, que calcula a idade exata em anos, meses e dias a partir da data de nascimento. Interface clean, com foco na experiência do usuário."/>
                 <CardProjetos link="https://form-community-of-developers.vercel.app/" title="Community of Developers" img={formProjeto} p="Formulário com design moderno e responsivo, onde o usuário seleciona sua stack, nível de experiência e revisa todas as informações antes de enviar. Possui validação robusta e feedbacks visuais que garantem uma ótima experiência de uso."/>
+                <CardProjetos link="https://meu-pet-tau.vercel.app/" title="Landing Page para Clínica Veterinária" img={dogProjeto} p="Projeto freelance de uma landing page responsiva, com foco em apresentar os serviços da clínica e facilitar o contato com os clientes. Layout limpo, moderno e otimizado para conversão."/>
+                <CardProjetos link="https://meu-pet-tau.vercel.app/" title="Landing Page para Clínica Médica Vita Med" img={vitaMedProjeto} p="Projeto freelance de uma landing page responsiva, desenvolvida para apresentar os serviços da clínica, transmitir confiança e facilitar o agendamento. Design moderno, seções bem estruturadas e foco na experiência do usuário."/>
 
             </div>
         </section>
