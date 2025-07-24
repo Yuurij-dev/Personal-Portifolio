@@ -8,9 +8,10 @@ import qrCodeGenerator from '../assets/qrcode.png'
 import alaradoProjeto from '../assets/projeto-alarado.png'
 import financas from '../assets/financas.jfif'
 import clima from '../assets/clima.png'
-import lua from '../assets/lua.webp'
+// import lua from '../assets/lua.webp'
 import dogProjeto from '../assets/projeto-dog.png'
 import vitaMedProjeto from '../assets/vitamed-projeto.png'
+import logo from '../assets/logo2.png'
 
 
 
@@ -111,7 +112,7 @@ function Home() {
       <header id='home' className='w-full flex flex-col items-center'>
 
         <div className='lua-box'>
-          <img src={lua} alt="lua" />
+          <img src={logo} alt="lua" />
         </div>
 
         <nav className='w-full flex justify-between items-center'>
