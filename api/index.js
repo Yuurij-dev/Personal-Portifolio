@@ -21,6 +21,7 @@ module.exports = async (req, res) => {
       text: message,
     });
     res.status(200).send("Email enviado com sucesso!");
+    console.log(message)
   } catch (error) {
     console.error(error);
     res.status(500).send("Erro ao enviar o email.");

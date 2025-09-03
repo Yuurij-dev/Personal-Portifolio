@@ -94,6 +94,7 @@ function Home() {
         setShowSucessMessage(true);
         setShowErrorMessage(false)
         setFormData({ nome: '', email: '', mensagem: '' });
+        console.log(response)
       }else{
         setShowErrorMessage(true)
         setShowSucessMessage(false)
