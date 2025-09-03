@@ -84,7 +84,7 @@ function Home() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          to: "yuriestudar21@gmail.com", 
+          to: import.meta.env.VITE_EMAIL_USER, 
           subject: `Mensagem de ${formData.nome} - ${formData.email}`,
           message: formData.mensagem
         })
@@ -94,7 +94,7 @@ function Home() {
         setShowSucessMessage(true);
         setShowErrorMessage(false)
         setFormData({ nome: '', email: '', mensagem: '' });
-        console.log(response)
+        console.log(import.meta.env.VITE_EMAIL_USER)
       }else{
         setShowErrorMessage(true)
         setShowSucessMessage(false)
