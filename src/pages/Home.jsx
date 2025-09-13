@@ -8,7 +8,7 @@ import qrCodeGenerator from '../assets/qrcode.png'
 import alaradoProjeto from '../assets/projeto-alarado.png'
 import financas from '../assets/financas.jfif'
 import clima from '../assets/clima.png'
-// import lua from '../assets/lua.webp'
+import barbershopImg from '../assets/barbershop.png'
 import dogProjeto from '../assets/projeto-dog.png'
 import vitaMedProjeto from '../assets/vitamed-projeto.png'
 import logo from '../assets/logo2.png'
@@ -198,8 +198,9 @@ function Home() {
             </div>
 
             <div className='grid-projetos w-full grid grid-cols-3 gap-8 justify-items-center '>
-                <CardProjetos link="https://controle-de-financas-yuurij.netlify.app/dashboard" title="Controle de Finaças" img={financas} p="Dashboard de Controle Financeiro, uma aplicação web que permite organizar receitas e despesas de forma simples e intuitiva."/>
+                <CardProjetos link="https://fws-barber-seven.vercel.app/" title="Ageaplicativo para agendamento de barbearia." img={barbershopImg} p="Aplicativo web desenvolvido para facilitar o agendamento de horários em barbearias. A ideia é eliminar a burocracia do contato manual, trazendo mais organização para os barbeiros e praticidade para os clientes."/>
                 <CardProjetos link="https://weather-web-git-main-yuurij-devs-projects.vercel.app/" title="Previsão de Clima" img={clima} p="Previsão de Clima um projeto com foco em integração de APIs e boas práticas de desenvolvimento front-end. A aplicação consome dados da API OpenWeatherMap e exibe a previsão do tempo de forma clara e responsiva."/>
+                <CardProjetos link="https://controle-de-financas-yuurij.netlify.app/dashboard" title="Controle de Finaças" img={financas} p="Dashboard de Controle Financeiro, uma aplicação web que permite organizar receitas e despesas de forma simples e intuitiva."/>
                 <CardProjetos link="https://gerenciador-de-produtos-lime.vercel.app/" title="Gerenciador de Produtos" img={dashboardProjeto} p="Front-End completo de um sistema completo com cadastro de produtos e usuários, controle de estoque, edição e remoção de itens. Possui dashboard com gráficos de vendas e frequência de usuários."/>
                 <CardProjetos link="https://qr-code-generator-mu-two.vercel.app/" title="Gerador de QR Code" img={qrCodeGenerator} p="Um gerador de QR Code simples, rápido e intuitivo, desenvolvido com HTML, CSS e JavaScript. Permite criar QR Codes personalizados a partir de qualquer texto ou link, com visualização em tempo real e opção de download da imagem. Ideal para facilitar o compartilhamento de informações de forma prática e acessível."/>
                 <CardProjetos link="https://alarado-home-page.vercel.app/" title="Alarado Home Page" img={alaradoProjeto} p="Landing page moderna com design responsivo, foco em UI/UX e layout clean, ideal para apresentar produtos ou serviços de forma clara e atrativa."/>
